@@ -55,6 +55,11 @@ const navItems: NavItem[] = [
         name: "Customer",
         path: "/customer",
         pro: false
+      },
+      {
+        name: "Major",
+        path: "/major",
+        pro: true
       }
     ]
   },

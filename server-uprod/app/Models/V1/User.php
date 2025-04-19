@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\V1;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\V1\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -17,11 +18,19 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    protected $table = 'users';
+
     protected $fillable = [
         'name',
+        'user_role_id',
         'email',
         'password',
     ];
+
+    public function user_role()
+    {
+        return $this->belongsTo(UserRole::class, 'user_role_id', 'id');
+    }
 
     /**
      * The attributes that should be hidden for serialization.

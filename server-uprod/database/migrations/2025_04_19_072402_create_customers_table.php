@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('no_ktp')->unique(); // Pastikan nomor KTP unik
             $table->string('email')->nullable()->unique(); // Menambahkan email
             $table->string('phone')->nullable(); // Menambahkan nomor telepon
+            $table->enum('gender', ['m', 'f'])->default(null)->nullable();
+            $table->date('date_of_birth')->nullable();
             $table->text('address')->nullable(); // Menambahkan alamat
             $table->timestamps();
         });
