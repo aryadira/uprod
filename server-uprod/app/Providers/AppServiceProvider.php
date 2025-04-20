@@ -3,7 +3,10 @@
 namespace App\Providers;
 
 use App\Models\V1\Major;
+use App\Models\V1\User;
+use App\Repositories\AuthRepository;
 use App\Repositories\V1\MajorRepository;
+use App\Services\V1\AuthService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,9 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(MajorRepository::class, function ($app) {
-            return new MajorRepository(new Major());
-        });
+        //
     }
 
     /**
