@@ -3,13 +3,23 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Services\V1\API\APIResponseService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct(protected APIResponseService $apiResponseService)
+    {
+    }
+
+    public function getCurrentUser()
+    {
+        $currentUser = Auth::user();
+
+        return $this->apiResponseService->sendSuccess('Get current user', $currentUser);
+    }
+
     public function index()
     {
         //
