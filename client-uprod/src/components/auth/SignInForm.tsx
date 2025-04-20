@@ -20,7 +20,6 @@ export default function SignInForm() {
 
   // }
 
-
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">
       <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
