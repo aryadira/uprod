@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import useAxios from "@/hooks/useAxios";
+import toast from "react-hot-toast";
 
 interface User {
   id: number;
@@ -43,12 +44,15 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
-  const [token, setToken] = useState<string | null>(() => {
-    if (typeof window !== "undefined") {
-      return Cookies.get("token") || null;
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedToken = Cookies.get("token");
+    if (storedToken) {
+      setToken(storedToken);
     }
-    return null;
-  });
+  }, []);
+
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -61,7 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       Cookies.remove("token");
     }
-  }, [token]);
+  }, [token, isLoading]);
 
   // Ambil current user berdasarkan token
   useEffect(() => {
@@ -77,7 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("Failed to fetch user", err);
         setCurrentUser(null);
         setToken(null);
-        router.push("/signin");
+        router.replace("/signin");
       } finally {
         setIsLoading(false);
       }
@@ -85,11 +89,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (token) {
       fetchUser();
-      router.push('/')
     } else {
-      router.push('/signin')
+      router.replace("/signin");
+      setIsLoading(false);
     }
-    
+
   }, [token]);
 
 
@@ -99,13 +103,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const res = await useAxios.post("/auth/signin", { email, password });
       const { token } = res.data.data;
-      if (token){
-        setToken(token)
-        router.push('/');
+      const { message } = res.data;
+
+      if (token) {
+        setToken(token);
+        toast.success(message);
+        router.push("/");
       } else {
-        setToken(null)
-        router.push('/signin');
+        setToken(null);
+        toast.error(message);
+        router.push("/signin");
       }
+
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Login failed";
       setErrorMessages(msg);
@@ -133,8 +142,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         password_confirmation: passwordConfirmation,
       });
 
-      if (res.data.data) {
+      const { message, status } = res.data;
+
+      if (status == "success") {
         router.push('/signin')
+        toast.success(message);
       }
 
     } catch (err: any) {
@@ -149,17 +161,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // signout
   const signout = async () => {
     try {
-      await useAxios.post("/auth/signout", null, {
+      const res = await useAxios.delete("/auth/signout", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-    } catch (err:any) {
-      if (err.response && err.response.data && err.response.data.errors) {
-        setErrorMessages(err.response.data.errors);
-      } else {
-        throw err;
-      }
+
+      const { message } = res.data;
+      toast.success(message);
+
+    } catch (err: any) {
+      setErrorMessages(err.response.data.message);
     } finally {
       setToken(null);
       setCurrentUser(null);

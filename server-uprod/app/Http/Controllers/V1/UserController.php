@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\V1\User;
 use App\Services\V1\API\APIResponseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,10 +16,25 @@ class UserController extends Controller
 
     public function getCurrentUser()
     {
-        $currentUser = request()->user();
+        $authUser = request()->user();
+
+        $roles = [
+            1 => 'superadmin',
+            2 => 'admin',
+            3 => 'customer',
+        ];
+
+        $roleName = $roles[$authUser->user_role_id] ?? null;
+
+        $currentUser = [
+            'name' => $authUser->name,
+            'email' => $authUser->email,
+            'role' => $roleName,
+        ];
 
         return $this->apiResponseService->sendSuccess('Get current user', $currentUser);
     }
+
 
     public function index()
     {
