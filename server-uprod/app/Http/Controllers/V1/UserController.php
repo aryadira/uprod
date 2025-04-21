@@ -15,7 +15,7 @@ class UserController extends Controller
 
     public function getCurrentUser()
     {
-        $currentUser = Auth::user();
+        $currentUser = request()->user();
 
         return $this->apiResponseService->sendSuccess('Get current user', $currentUser);
     }

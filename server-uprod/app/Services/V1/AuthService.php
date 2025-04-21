@@ -2,6 +2,9 @@
 
 namespace App\Services\V1;
 
+use App\Enums\UserRole;
+use App\Models\V1\Customer;
+use App\Models\V1\User;
 use App\Repositories\V1\AuthRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -14,10 +17,28 @@ class AuthService
 
     public function signup(array $data)
     {
-        // $user = $this->authRepository->register([
-        //     'name' => $data['name'],
-        //     ''
-        // ])
+        $user = $this->authRepository->register([
+            'user_role_id' => UserRole::CUSTOMER->value,
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password'])
+        ]);
+
+        if (isset($user)) {
+            Customer::create([
+                'user_id' => $user->id,
+                'fullname' => $user->name,
+                'nik' => null,
+                'no_ktp' => null,
+                'email' => $user->email,
+                'phone' => null,
+                'gender' => null,
+                'date_of_birth' => null,
+                'address' => null
+            ]);
+        }
+
+        return $user;
     }
 
     public function authenticate($credentials): string|null

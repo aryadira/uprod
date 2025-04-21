@@ -16,7 +16,6 @@ class UserSeeder extends Seeder
     {
         $users = [
             [
-                "id" => 1,
                 'user_role_id' => 1,
                 "name" => 'superadmin',
                 'email' => 'superadmin@test.com',
@@ -24,7 +23,6 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('12345678')
             ],
             [
-                "id" => 2,
                 'user_role_id' => 2,
                 "name" => 'admin',
                 'email' => 'admin@test.com',
@@ -32,7 +30,6 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('12345678')
             ],
             [
-                "id" => 3,
                 'user_role_id' => 3,
                 "name" => 'customer',
                 'email' => 'customer@test.com',

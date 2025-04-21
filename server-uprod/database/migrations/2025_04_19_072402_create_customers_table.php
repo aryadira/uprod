@@ -13,15 +13,19 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->nullable(false);
+
             $table->string('fullname');
-            $table->string('nik')->unique(); // Pastikan NIK unik
-            $table->string('no_ktp')->unique(); // Pastikan nomor KTP unik
-            $table->string('email')->nullable()->unique(); // Menambahkan email
+            $table->string('nik')->unique()->nullable(); // Pastikan NIK unik
+            $table->string('no_ktp')->unique()->nullable(); // Pastikan nomor KTP unik
+            $table->string('email')->unique()->nullable(); // Menambahkan email
             $table->string('phone')->nullable(); // Menambahkan nomor telepon
             $table->enum('gender', ['m', 'f'])->default(null)->nullable();
             $table->date('date_of_birth')->nullable();
             $table->text('address')->nullable(); // Menambahkan alamat
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
 
     }

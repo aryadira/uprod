@@ -19,11 +19,11 @@ class AuthController extends Controller
 
     public function signup(UserRegisterRequest $request)
     {
-        // $validated = $request->validated();
+        $validated = $request->validated();
 
-        // $this->authService->signup($validated);
+        $newUser = $this->authService->signup($validated);
 
-        // return $this->apiResponseService->sendSuccess();
+        return $this->apiResponseService->sendSuccess('Sign up successfully!', $newUser);
     }
 
     public function signin(UserLoginRequest $request)

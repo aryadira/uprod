@@ -1,28 +1,49 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import Checkbox from "@/components/form/input/Checkbox";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
-import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
+import { useAuth } from "@/context/AuthContext";
+import { EyeCloseIcon, EyeIcon } from "@/icons";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { ChangeEvent, FormEvent, useState } from "react";
+import { GlobalErrorMessage } from "../form/input/GlobalErrorMessage";
+import useRedirectIfAuthenticated from "@/hooks/useRedirectIfAuthenticated";
+
+interface SignInType {
+  email: string;
+  password: string;
+}
 
 export default function SignInForm() {
+  useRedirectIfAuthenticated();
+
+  const { signin, isLoading, errorMessages} = useAuth();
+
   const [showPassword, setShowPassword] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
-  const [email, setEmail] = useState("")
-  const [password, setPasswword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
 
-  // const handleSubmit = () => {
+  const [formData, setFormData] = useState<SignInType>({
+    email: '',
+    password: ''
+  })
 
-  // }
+  const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    signin(formData.email, formData.password);
+  }
 
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">
-      <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
+      {/* <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
         <Link
           href="/"
           className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
@@ -30,7 +51,7 @@ export default function SignInForm() {
           <ChevronLeftIcon />
           Back to dashboard
         </Link>
-      </div>
+      </div> */}
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
           <div className="mb-5 sm:mb-8">
@@ -94,13 +115,23 @@ export default function SignInForm() {
                 </span>
               </div>
             </div> */}
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="space-y-6">
                 <div>
                   <Label>
                     Email <span className="text-error-500">*</span>{" "}
                   </Label>
-                  <Input placeholder="info@gmail.com" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <Input 
+                    name="email"
+                    placeholder="info@gmail.com" 
+                    type="email" 
+                    value={formData.email}
+                    onChange={handleOnChange} 
+                    required 
+                  />
+                  {typeof errorMessages === "string" && (
+                    <GlobalErrorMessage message={errorMessages} />
+                  )}
                 </div>
                 <div>
                   <Label>
@@ -108,8 +139,12 @@ export default function SignInForm() {
                   </Label>
                   <div className="relative">
                     <Input
+                      name="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
+                      value={formData.password}
+                      onChange={handleOnChange}
+                      required
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -122,8 +157,11 @@ export default function SignInForm() {
                       )}
                     </span>
                   </div>
+                  {typeof errorMessages === "string" && (
+                    <GlobalErrorMessage message={errorMessages} />
+                  )}
                 </div>
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Checkbox checked={isChecked} onChange={setIsChecked} />
                     <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
@@ -136,10 +174,11 @@ export default function SignInForm() {
                   >
                     Forgot password?
                   </Link>
-                </div>
+                </div> */}
                 <div>
-                  <Button className="w-full" size="sm">
-                    Sign in
+                  {/* <!-- Button --> */}
+                  <Button className="w-full" disabled={isLoading}>
+                    {isLoading ? 'Loading...' : "Sign In"}
                   </Button>
                 </div>
               </div>

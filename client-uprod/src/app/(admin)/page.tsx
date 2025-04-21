@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { EcommerceMetrics } from "@/components/ecommerce/EcommerceMetrics";
 import React from "react";
@@ -7,15 +7,22 @@ import MonthlySalesChart from "@/components/ecommerce/MonthlySalesChart";
 import StatisticsChart from "@/components/ecommerce/StatisticsChart";
 import RecentOrders from "@/components/ecommerce/RecentOrders";
 import DemographicCard from "@/components/ecommerce/DemographicCard";
-
-import withAuth from "@/utils/withAuth";
+import useProtectedRoute from "@/hooks/useProtectionRoute";
+import { useAuth } from "@/context/AuthContext";
 
 function DashboardPage() {
+  useProtectedRoute();
+
+  const { isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div className="p-6 text-center">Loading...</div>;
+  }
+
   return (
     <div className="grid grid-cols-12 gap-4 md:gap-6">
       <div className="col-span-12 space-y-6 xl:col-span-7">
         <EcommerceMetrics />
-
         <MonthlySalesChart />
       </div>
 
@@ -38,4 +45,4 @@ function DashboardPage() {
   );
 }
 
-export default withAuth(DashboardPage);
+export default DashboardPage;
