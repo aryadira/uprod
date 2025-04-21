@@ -16,8 +16,8 @@ interface User {
 type ErrorMessageType = Record<string, string[]> | string | null;
 
 interface AuthContextType {
-  token: string | null;
-  setToken: (token: string | null) => void;
+  authToken: string | null;
+  setAuthToken: (token: string | null) => void;
   currentUser: User | null;
   setCurrentUser: (user: User | null) => void;
   isLoading: boolean;
@@ -29,8 +29,8 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType>({
-  token: null,
-  setToken: () => { },
+  authToken: null,
+  setAuthToken: () => { },
   currentUser: null,
   setCurrentUser: () => { },
   isLoading: false,
@@ -44,28 +44,27 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
-  const [token, setToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    const storedToken = Cookies.get("token");
-    if (storedToken) {
-      setToken(storedToken);
-    }
-  }, []);
-
+  const [authToken, setAuthToken] = useState<string | null>(null);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessages, setErrorMessages] = useState<ErrorMessageType>(null);
 
-  // Simpan/hapus token dari cookie
   useEffect(() => {
-    if (token) {
-      Cookies.set("token", token, { expires: 7 });
-    } else {
-      Cookies.remove("token");
+    const storedToken = Cookies.get("authToken");
+    if (storedToken) {
+      setAuthToken(storedToken);
     }
-  }, [token, isLoading]);
+  }, []);
+
+  // Redirect ke halaman utama jika token ada dan tidak sedang loading
+  useEffect(() => {
+    if (authToken) {  
+      Cookies.set('authToken', authToken, { expires: 7 });
+    } else {
+      Cookies.remove('authToken');
+    }
+  }, [authToken]);
 
   // Ambil current user berdasarkan token
   useEffect(() => {
@@ -73,29 +72,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const res = await useAxios.get("/user/current", {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${authToken}`,
           },
         });
         setCurrentUser(res.data.data);
       } catch (err) {
         console.error("Failed to fetch user", err);
         setCurrentUser(null);
-        setToken(null);
-        router.replace("/signin");
+        setAuthToken(null);
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (token) {
+    if (authToken) {
       fetchUser();
-    } else {
-      router.replace("/signin");
-      setIsLoading(false);
     }
 
-  }, [token]);
-
+  }, [authToken]);
 
   // signin
   const signin = async (email: string, password: string) => {
@@ -106,11 +100,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { message } = res.data;
 
       if (token) {
-        setToken(token);
+        setAuthToken(token);
         toast.success(message);
-        router.push("/");
       } else {
-        setToken(null);
+        setAuthToken(null);
         toast.error(message);
         router.push("/signin");
       }
@@ -121,7 +114,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     finally {
       setIsLoading(false);
-    }
+    } 
   };
 
   // signup
@@ -163,7 +156,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const res = await useAxios.delete("/auth/signout", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authToken}`,
         },
       });
 
@@ -173,17 +166,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (err: any) {
       setErrorMessages(err.response.data.message);
     } finally {
-      setToken(null);
+      setAuthToken(null);
       setCurrentUser(null);
-      router.push("/signin");
     }
   };
 
   return (
     <AuthContext.Provider
       value={{
-        token,
-        setToken,
+        authToken,
+        setAuthToken,
         currentUser,
         setCurrentUser,
         isLoading,

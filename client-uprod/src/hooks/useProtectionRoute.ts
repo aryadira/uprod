@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 export default function useProtectedRoute() {
-  const { token, isLoading } = useAuth();
+  const { authToken, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !token) {
+    if (!isLoading && !authToken) {
       router.push("/signin");
     }
-  }, [isLoading, token]);
+  }, [isLoading, authToken, router]);
 }

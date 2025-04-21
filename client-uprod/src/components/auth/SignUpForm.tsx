@@ -9,7 +9,6 @@ import Link from "next/link";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import Button from "../ui/button/Button";
 import InputErrorMessage from "../form/input/InputErrorMessage";
-import useRedirectIfAuthenticated from "@/hooks/useRedirectIfAuthenticated";
 
 interface SignUpType {
   name: string;
@@ -19,8 +18,6 @@ interface SignUpType {
 }
 
 export default function SignUpForm() {
-  useRedirectIfAuthenticated();
-
   const { signup, isLoading, errorMessages } = useAuth();
 
   const [showPassword, setShowPassword] = useState({

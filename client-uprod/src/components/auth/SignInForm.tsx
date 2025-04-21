@@ -8,7 +8,6 @@ import { EyeCloseIcon, EyeIcon } from "@/icons";
 import Link from "next/link";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { GlobalErrorMessage } from "../form/input/GlobalErrorMessage";
-import useRedirectIfAuthenticated from "@/hooks/useRedirectIfAuthenticated";
 
 interface SignInType {
   email: string;
@@ -16,8 +15,6 @@ interface SignInType {
 }
 
 export default function SignInForm() {
-  useRedirectIfAuthenticated();
-
   const { signin, isLoading, errorMessages} = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);

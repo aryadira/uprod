@@ -7,12 +7,9 @@ import MonthlySalesChart from "@/components/ecommerce/MonthlySalesChart";
 import StatisticsChart from "@/components/ecommerce/StatisticsChart";
 import RecentOrders from "@/components/ecommerce/RecentOrders";
 import DemographicCard from "@/components/ecommerce/DemographicCard";
-import useProtectedRoute from "@/hooks/useProtectionRoute";
 import { useAuth } from "@/context/AuthContext";
 
 function DashboardPage() {
-  useProtectedRoute();
-
   const { isLoading } = useAuth();
 
   if (isLoading) {

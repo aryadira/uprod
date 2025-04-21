@@ -3,12 +3,12 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function useRedirectIfAuthenticated() {
-  const { token } = useAuth();
+  const { authToken } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (token) {
-      router.push("/");
+    if (authToken) {
+      router.back();
     }
-  }, [token]);
+  }, [authToken, router]);
 }
