@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       router.forward()
     }
   }, [router]);
-  
+
   // Ambil current user berdasarkan token
   useEffect(() => {
     const fetchUser = async () => {
@@ -91,24 +91,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const res = await useAxios.post("/auth/signin", { email, password });
       const { message, token, status } = res.data;
 
-      if (status == "success") {
-        Cookies.set('authToken', token, { expires: 7 });
+      if (status === "success") {
+        // Simpan token ke cookie dan state
+        Cookies.set("authToken", token, { expires: 7 });
         setAuthToken(token);
+
+        // Ambil data user
+        const userRes = await useAxios.get("/user/current", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const user = userRes.data.user;
+        setCurrentUser(user);
+
+        if (user.role === "customer") {
+          router.push("/homepage");
+        } else {
+          router.push("/");
+        }
+
         toast.success(message);
-        router.push('/')
+        toast.success(`Welcome ${user.name}`);
+
       } else {
         setAuthToken(null);
         toast.error(message);
         router.push("/signin");
       }
+
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Login failed";
       setErrorMessages(msg);
-    }
-    finally {
+    } finally {
       setIsLoading(false);
-    } 
+    }
   };
+
 
   // signup
   const signup = async (
@@ -134,7 +153,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         router.push('/signin')
         toast.success(message);
       }
-      
+
     } catch (err: any) {
       const errs = err?.response?.data?.errors || "Signup failed";
       setErrorMessages(errs);
@@ -153,7 +172,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         },
       });
       const { message, status } = res.data;
-      if(status == "success"){
+      if (status == "success") {
         toast.success(message);
         router.push('/signin');
       }
