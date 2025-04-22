@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\V1\Major;
 use App\Models\V1\User;
 use App\Services\V1\API\APIResponseService;
 use Illuminate\Http\Request;
@@ -38,6 +39,40 @@ class UserController extends Controller
             'user' => $currentUser
         ]);
     }
+
+    public function findAdminByEmail(Request $request)
+    {
+        $email = $request->query('email');
+
+        $admin = User::query()->where('user_role_id', 2)
+            ->where('email', $email)
+            ->select('id', 'email')
+            ->first();
+
+        if ($admin) {
+            // Cek apakah admin sudah digunakan di tabel majors
+            $isAdminUsed = Major::query()->where('admin_id', $admin->id)->exists();
+
+            if ($isAdminUsed) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Admin sudah digunakan di major ini.',
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Admin dapat digunakan.',
+                    'admin' => $admin
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Admin tidak ditemukan.',
+            ]);
+        }
+    }
+
 
 
     public function index()

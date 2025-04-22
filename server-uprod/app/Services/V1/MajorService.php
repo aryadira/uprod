@@ -7,7 +7,7 @@ use App\Repositories\V1\MajorRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
-use function App\Helpers\generate_code;
+use function App\Helpers\generateCode;
 use function App\Helpers\generateAcronim;
 
 class MajorService
@@ -30,11 +30,11 @@ class MajorService
     {
         $currentUser = Auth::user();
 
-        $data['created_by'] = $currentUser;
+        // $data['created_by'] = $currentUser;
         $data['slug'] = Str::slug($data['name']);
         $data['name'] = ucwords($data['name']);
         $data['acronim'] = generateAcronim($data['name']);
-        $data['code'] = generate_code($data['acronim'], Major::class, 'code');
+        $data['code'] = generateCode($data['acronim'], Major::class, 'code');
 
         return $this->majorRepository->createMajor($data);
     }

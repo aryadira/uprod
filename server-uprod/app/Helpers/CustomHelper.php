@@ -5,7 +5,7 @@ namespace App\Helpers;
 use Illuminate\Support\Facades\DB;
 
 if (!function_exists('generate_code')) {
-    function generate_code(string $prefix, string $modelClass, string $column = 'code'): string
+    function generateCode(string $prefix, string $modelClass, string $column = 'code'): string
     {
         $year = date('Y');
         $last = DB::table((new $modelClass)->getTable())

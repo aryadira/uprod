@@ -19,6 +19,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('user')->name('user.')->group(function () {
             Route::get('/current', [UserController::class, 'getCurrentUser'])->name('current');
+            Route::get('/admin', [UserController::class, 'findAdminByEmail'])->name('admin');
         });
 
         Route::middleware('role:superadmin,admin')->group(function () {

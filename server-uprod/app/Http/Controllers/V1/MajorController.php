@@ -31,8 +31,8 @@ class MajorController extends Controller
             'logo_path' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'banner_path' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:4096'],
             'name' => ['required', 'string', 'max:100', 'unique:majors,name'],
-            'acronim' => ['required', 'string', 'max:10', 'unique:majors,acronim'],
-            'description' => ['nullable', 'string', 'max:1000'],
+            // 'acronim' => ['required', 'string', 'max:10', 'unique:majors,acronim'],
+            // 'description' => ['nullable', 'string', 'max:1000'],
         ]);
 
         if ($request->hasFile('logo_path')) {
