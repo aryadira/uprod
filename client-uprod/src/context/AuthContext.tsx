@@ -65,7 +65,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             Authorization: `Bearer ${authToken}`,
           },
         });
-        setCurrentUser(res.data.data);
+        const user = res.data.user;
+        setCurrentUser(user);
       } catch (err) {
         console.error("Failed to fetch user", err);
         setCurrentUser(null);
@@ -84,11 +85,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // signin
   const signin = async (email: string, password: string) => {
     setIsLoading(true);
+    setErrorMessages(null);
+
     try {
       const res = await useAxios.post("/auth/signin", { email, password });
-      const { message, token } = res.data;
+      const { message, token, status } = res.data;
 
-      if (res.data.status) {
+      if (status == "success") {
         Cookies.set('authToken', token, { expires: 7 });
         setAuthToken(token);
         toast.success(message);
@@ -98,7 +101,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         toast.error(message);
         router.push("/signin");
       }
-
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Login failed";
       setErrorMessages(msg);
@@ -150,9 +152,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           Authorization: `Bearer ${authToken}`,
         },
       });
-      const { message } = res.data;
-      toast.success(message);
-      router.push('/signin');
+      const { message, status } = res.data;
+      if(status == "success"){
+        toast.success(message);
+        router.push('/signin');
+      }
     } catch (err: any) {
       setErrorMessages(err.response.data.message);
     } finally {

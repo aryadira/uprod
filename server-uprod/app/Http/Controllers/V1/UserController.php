@@ -32,7 +32,11 @@ class UserController extends Controller
             'role' => $roleName,
         ];
 
-        return $this->apiResponseService->sendSuccess('Get current user', $currentUser);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Get current user',
+            'user' => $currentUser
+        ]);
     }
 
 
