@@ -20,8 +20,12 @@ Route::prefix('v1')->name('v1.')->group(function () {
         Route::prefix('user')->name('user.')->group(function () {
             Route::get('/current', [UserController::class, 'getCurrentUser'])->name('current');
         });
-        
-        Route::middleware('role:admin')->group(function () {
+
+        Route::middleware('role:superadmin,admin')->group(function () {
+
+        });
+
+        Route::middleware('role:customer')->group(function () {
 
         });
     });

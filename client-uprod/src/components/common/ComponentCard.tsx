@@ -6,7 +6,8 @@ interface ComponentCardProps {
   children: React.ReactNode;
   className?: string; // Additional custom classes for styling
   desc?: string; // Description text
-  buttonText?: string; // Description button text
+  buttonText?: string;
+  buttonHref?: string; // Description button text
 }
 
 const ComponentCard: React.FC<ComponentCardProps> = ({
@@ -15,6 +16,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
   className = "",
   desc = "",
   buttonText = "",
+  buttonHref = "",
 }) => {
   return (
     <div
@@ -32,7 +34,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
             </p>
           )}
         </div>
-        {buttonText && <Button>{buttonText}</Button>}
+        {buttonText && <Button href={buttonHref} type="link">{buttonText}</Button>}
       </div>
 
       {/* Card Body */}

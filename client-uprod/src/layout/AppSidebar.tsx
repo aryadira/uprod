@@ -59,7 +59,7 @@ const navItems: NavItem[] = [
       {
         name: "Major",
         path: "/major",
-        pro: true
+        pro: false
       }
     ]
   },

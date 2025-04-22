@@ -92,11 +92,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { message, token, status } = res.data;
 
       if (status === "success") {
-        // Simpan token ke cookie dan state
         Cookies.set("authToken", token, { expires: 7 });
         setAuthToken(token);
 
-        // Ambil data user
         const userRes = await useAxios.get("/user/current", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -105,10 +103,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const user = userRes.data.user;
         setCurrentUser(user);
 
-        if (user.role === "customer") {
-          router.push("/homepage");
-        } else {
-          router.push("/");
+        switch (user.role) {
+          case 'customer':
+            router.push('/homepage');
+            break;
+          case 'superadmin':
+          case 'admin':
+            router.push('/');
+            break;
+          default:
+            router.push('/unauthorized');
+            break;
         }
 
         toast.success(message);

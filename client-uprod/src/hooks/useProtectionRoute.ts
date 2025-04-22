@@ -10,7 +10,9 @@ export default function useProtectedRoute() {
 
   useEffect(() => {
     if (!isLoading && !authToken) {
-      router.push("/signin");
+      router.replace("/signin");
     }
   }, [isLoading, authToken, router]);
+
+  return
 }

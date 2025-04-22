@@ -39,7 +39,7 @@ const majorData: Major[] = [
     is_active: true,
   },
   {
-    id: 2,
+    id: 2,  
     admin_id: 11,
     created_by: "admin",
     slug: "rekayasa-perangkat-lunak",

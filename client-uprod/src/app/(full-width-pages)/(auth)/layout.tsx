@@ -1,7 +1,9 @@
+"use client"
 import GridShape from "@/components/common/GridShape";
 import ThemeTogglerTwo from "@/components/common/ThemeTogglerTwo";
 
 import { ThemeProvider } from "@/context/ThemeContext";
+import useRedirectIfAuthenticated from "@/hooks/useRedirectIfAuthenticated";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -11,6 +13,8 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
+  useRedirectIfAuthenticated();
+
   return (
     <div className="relative p-6 bg-white z-1 dark:bg-gray-900 sm:p-0">
       <ThemeProvider>
