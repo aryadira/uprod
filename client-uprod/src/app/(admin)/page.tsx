@@ -9,7 +9,7 @@ import RecentOrders from "@/components/ecommerce/RecentOrders";
 import DemographicCard from "@/components/ecommerce/DemographicCard";
 import { useAuth } from "@/context/AuthContext";
 
-function DashboardPage() {
+export default function DashboardPage() {
   const { isLoading } = useAuth();
 
   if (isLoading) {
@@ -42,4 +42,3 @@ function DashboardPage() {
   );
 }
 
-export default DashboardPage;

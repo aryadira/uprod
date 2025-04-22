@@ -43,9 +43,7 @@ const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-
   const [authToken, setAuthToken] = useState<string | null>(null);
-
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessages, setErrorMessages] = useState<ErrorMessageType>(null);
@@ -54,18 +52,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const storedToken = Cookies.get("authToken");
     if (storedToken) {
       setAuthToken(storedToken);
+      router.forward()
     }
-  }, []);
-
-  // Redirect ke halaman utama jika token ada dan tidak sedang loading
-  useEffect(() => {
-    if (authToken) {  
-      Cookies.set('authToken', authToken, { expires: 7 });
-    } else {
-      Cookies.remove('authToken');
-    }
-  }, [authToken]);
-
+  }, [router]);
+  
   // Ambil current user berdasarkan token
   useEffect(() => {
     const fetchUser = async () => {
@@ -96,12 +86,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     try {
       const res = await useAxios.post("/auth/signin", { email, password });
-      const { token } = res.data.data;
-      const { message } = res.data;
+      const { message, token } = res.data;
 
-      if (token) {
+      if (res.data.status) {
+        Cookies.set('authToken', token, { expires: 7 });
         setAuthToken(token);
         toast.success(message);
+        router.push('/')
       } else {
         setAuthToken(null);
         toast.error(message);
@@ -141,7 +132,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         router.push('/signin')
         toast.success(message);
       }
-
+      
     } catch (err: any) {
       const errs = err?.response?.data?.errors || "Signup failed";
       setErrorMessages(errs);
@@ -159,13 +150,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           Authorization: `Bearer ${authToken}`,
         },
       });
-
       const { message } = res.data;
       toast.success(message);
-
+      router.push('/signin');
     } catch (err: any) {
       setErrorMessages(err.response.data.message);
     } finally {
+      Cookies.remove('authToken');
       setAuthToken(null);
       setCurrentUser(null);
     }

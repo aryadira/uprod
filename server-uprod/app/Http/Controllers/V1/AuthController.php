@@ -36,7 +36,9 @@ class AuthController extends Controller
             return $this->apiResponseService->sendError('Invalid email or password');
         }
 
-        return $this->apiResponseService->sendSuccess('Sign in successfully!', [
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Sign in successfully!',
             'token' => $authenticate
         ]);
     }
