@@ -12,7 +12,7 @@ import Image from "next/image";
 import useAxios from "@/hooks/useAxios";
 import { useAuth } from "@/context/AuthContext";
 import Loader from "@/components/common/Loader";
-import { RefreshCw } from 'lucide-react';
+import RefreshButton from "@/components/common/RefreshButton";
 
 interface Major {
   id: number;
@@ -69,13 +69,13 @@ export default function TableMajor() {
   }, [authToken]);
 
   const handleRefresh = () => {
-    fetchMajor(); // Panggil ulang
+    fetchMajor();
   };
 
   return (
     <div className="overflow-hidden rounded-xl border bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="control-table p-3">
-        <button onClick={handleRefresh} className="refresh-btn p-2 border border-slate-200 rounded-lg hover:bg-slate-50"><RefreshCw className="size-5 text-slate-500" /></button>
+        <RefreshButton onClick={handleRefresh} />
       </div>
       <div className="max-w-full overflow-x-auto">
         {isLoading ? (
