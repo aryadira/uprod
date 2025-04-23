@@ -21,7 +21,7 @@ class Major extends Model
         'is_active'
     ];
 
-    public function admin()
+    public function user()
     {
         return $this->belongsTo(User::class, 'admin_id', 'id');
     }

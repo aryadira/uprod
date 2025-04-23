@@ -28,13 +28,12 @@ class MajorService
 
     public function createMajor(array $data): Major
     {
-        $currentUser = Auth::user();
+        $data['slug'] = Str::slug($data['name'], '_'); // => "information_systems"
 
-        // $data['created_by'] = $currentUser;
-        $data['slug'] = Str::slug($data['name']);
-        $data['name'] = ucwords($data['name']);
-        $data['acronim'] = generateAcronim($data['name']);
-        $data['code'] = generateCode($data['acronim'], Major::class, 'code');
+        $data['acronim'] = collect(explode(' ', $data['name']))
+            ->filter(fn($word) => ctype_upper($word[0]))
+            ->map(fn($word) => strtoupper(substr($word, 0, 1)))
+            ->join('');
 
         return $this->majorRepository->createMajor($data);
     }

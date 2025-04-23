@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -8,122 +9,141 @@ import {
 } from "@/components/ui/table";
 
 import Image from "next/image";
-import Badge from "@/components/ui/badge/Badge";
+import useAxios from "@/hooks/useAxios";
+import { useAuth } from "@/context/AuthContext";
+import Loader from "@/components/common/Loader";
+import { RefreshCw } from 'lucide-react';
 
 interface Major {
   id: number;
   admin_id: number;
-  created_by: string;
   slug: string;
   code: string;
-  logo_path: string;
-  banner_path: string;
+  logo_path: string | null;
+  banner_path: string | null;
   name: string;
   acronim: string;
   description: string;
   is_active: boolean;
+  user: {
+    id: number;
+    name: string;
+  };
 }
-
-const majorData: Major[] = [
-  {
-    id: 1,
-    admin_id: 10,
-    created_by: "admin",
-    slug: "sistem-informasi-jaringan-aplikasi",
-    code: "SIJA20250001",
-    logo_path: "/images/majors/sija-logo.jpg",
-    banner_path: "/images/majors/sija-banner.jpg",
-    name: "Sistem Informasi Jaringan dan Aplikasi",
-    acronim: "SIJA",
-    description: "Jurusan yang fokus pada pengembangan sistem informasi dan jaringan komputer.",
-    is_active: true,
-  },
-  {
-    id: 2,  
-    admin_id: 11,
-    created_by: "admin",
-    slug: "rekayasa-perangkat-lunak",
-    code: "RPL20250002",
-    logo_path: "/images/majors/rpl-logo.jpg",
-    banner_path: "/images/majors/rpl-banner.jpg",
-    name: "Rekayasa Perangkat Lunak",
-    acronim: "RPL",
-    description: "Jurusan yang mempelajari proses rekayasa dan pengembangan perangkat lunak.",
-    is_active: false,
-  },
-];
 
 const headerCell = [
   { id: 1, name: "No." },
   { id: 2, name: "Logo" },
-  { id: 3, name: "Code" },
-  { id: 4, name: "Name" },
-  { id: 5, name: "Acronim" },
-  { id: 6, name: "Created By" },
-  { id: 7, name: "Status" },
+  { id: 3, name: "Major Name" },
+  { id: 4, name: "Acronim" },
+  { id: 5, name: "User Admin" },
 ];
 
 export default function TableMajor() {
-  return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-      <div className="max-w-full overflow-x-auto">
-        <div className="min-w-[1000px]">
-          <Table>
-            <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-              <TableRow>
-                {headerCell.map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    isHeader
-                    className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                  >
-                    {cell.name}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHeader>
+  const { authToken } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [majors, setMajors] = useState<Major[]>([]);
 
-            <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {majorData.map((major, index) => (
-                <TableRow key={major.id}>
-                  <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {index + 1}
-                  </TableCell>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start">
-                    <div className="w-10 h-10 overflow-hidden rounded-md">
-                      <Image
-                        width={40}
-                        height={40}
-                        src={major.logo_path}
-                        alt={major.name}
-                      />
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-800 text-theme-sm dark:text-white/90">
-                    {major.code}
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-800 text-theme-sm dark:text-white/90">
-                    {major.name}
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-800 text-theme-sm dark:text-white/90">
-                    {major.acronim}
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {major.created_by}
-                  </TableCell>
-                  <TableCell className="px-4 py-3">
-                    <Badge
-                      size="sm"
-                      color={major.is_active ? "success" : "error"}
+  // Pindahkan ke luar agar bisa dipakai di tempat lain juga
+  const fetchMajor = async () => {
+    setIsLoading(true);
+    try {
+      const res = await useAxios.get("/major", {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      const { major } = res.data;
+      setMajors(major);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (authToken) {
+      fetchMajor();
+    }
+  }, [authToken]);
+
+  const handleRefresh = () => {
+    fetchMajor(); // Panggil ulang
+  };
+
+  return (
+    <div className="overflow-hidden rounded-xl border bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+      <div className="control-table p-3">
+        <button onClick={handleRefresh} className="refresh-btn p-2 border border-slate-200 rounded-lg hover:bg-slate-50"><RefreshCw className="size-5 text-slate-500" /></button>
+      </div>
+      <div className="max-w-full overflow-x-auto">
+        {isLoading ? (
+          <div className="w-full flex items-center justify-center p-10">
+            <Loader />
+          </div>
+        ) : (
+          <div className="min-w-[1000px]">
+            <Table>
+              <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                <TableRow>
+                  {headerCell.map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      isHeader
+                      className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                     >
-                      {major.is_active ? "Active" : "Inactive"}
-                    </Badge>
-                  </TableCell>
+                      {cell.name}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+
+              <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                {majors.map((major, index) => (
+                  <TableRow key={major.id}>
+                    <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                      {index + 1}
+                    </TableCell>
+                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                      <div className="w-10 h-10 overflow-hidden rounded-md bg-gray-100">
+                        {major.logo_path ? (
+                          <Image
+                            width={40}
+                            height={40}
+                            src={major.logo_path}
+                            alt={major.name}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center p-3 justify-center text-xs text-gray-400">
+                            No Logo
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-gray-800 text-theme-sm dark:text-white/90">
+                      {major.name}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-gray-800 text-theme-sm dark:text-white/90">
+                      {major.acronim}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                      {major.user?.name ?? "-"}
+                    </TableCell>
+                    {/* <TableCell className="px-4 py-3">
+                      <Badge
+                        size="sm"
+                        color={major.is_active ? "success" : "error"}
+                      >
+                        {major.is_active ? "Active" : "Inactive"}
+                      </Badge>
+                    </TableCell> */}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
     </div>
   );

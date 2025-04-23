@@ -1,85 +1,74 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { FormEvent, useState } from "react";
-import ComponentCard from "@/components/common/ComponentCard";
-import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import Label from "@/components/form/Label";
-import FileInput from "@/components/form/input/FileInput";
-import Input from "@/components/form/input/InputField";
-import TextArea from "@/components/form/input/TextArea";
+import { FormEvent, useState, ChangeEvent } from "react";
 import Image from "next/image";
 import useAxios from "@/hooks/useAxios";
 import { useAuth } from "@/context/AuthContext";
 
+import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import ComponentCard from "@/components/common/ComponentCard";
+import FormInputGroup from "@/components/form/form-elements/FormInputGroup";
+import Label from "@/components/form/Label";
+import Input from "@/components/form/input/InputField";
+import FileInput from "@/components/form/input/FileInput";
+import TextArea from "@/components/form/input/TextArea";
+import Button from "@/components/ui/button/Button";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import Loader from "@/components/common/Loader";
+
 export default function CreateMajor() {
   const { authToken } = useAuth();
+  const router = useRouter();
 
-  const [adminMessage, setAdminMessage] = useState("");
-  const [searchEmail, setSearchEmail] = useState("");
   const [admin, setAdmin] = useState({ id: null, email: "" });
+  const [searchEmail, setSearchEmail] = useState("");
+  const [adminMessage, setAdminMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
-  const [acronim, setAcronim] = useState<string>("");
+  const [acronym, setAcronym] = useState<string>("");
   const [slug, setSlug] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const [abortController, setAbortController] = useState<AbortController | null>(null);
-
-  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    setPreview: (value: string) => void
+  ) => {
     const file = event.target.files?.[0];
-    if (file) setLogoPreview(URL.createObjectURL(file));
+    if (file) setPreview(URL.createObjectURL(file));
   };
 
-  const handleBannerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) setBannerPreview(URL.createObjectURL(file));
+  const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value.trim();
+    setAcronym(
+      name
+        .trim()
+        .split(/\s+/)
+        .filter((word) => word && !word.includes(word.toLowerCase()))
+        .map((word) => word[0]?.toUpperCase())
+        .join("")
+    );
+    setSlug(name.toLowerCase().replace(/\s+/g, "_"));
   };
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value;
-
-    const newAcronim = newName
-      .trim()
-      .split(/\s+/)
-      .filter((word) => word && !word.includes(word.toLowerCase()))
-      .map((word) => word[0]?.toUpperCase())
-      .join("");
-
-    const newSlug = newName.trim().toLowerCase().replace(/\s+/g, "_");
-
-    setAcronim(newAcronim);
-    setSlug(newSlug);
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("Form submitted");
+  const handleEmailAdminChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const email = e.target.value;
+    setSearchEmail(email);
+    searchAdmin(email);
   };
 
   const searchAdmin = async (email: string) => {
-    // Reset admin data dan validasi saat input kosong
-    if (!email) {
-      setAdminMessage("");
-      setAdmin({ id: null, email: "" });
-      setLoading(false);  // Reset loading saat input kosong
-      return;
-    }
+    if (!email) return resetAdmin();
 
-    // Validasi format email menggunakan regex
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(email)) {
-      setLoading(false);  // Reset loading saat email tidak valid
-      setAdminMessage("Format email belum benar");
-      setAdmin({ id: null, email: "" });
-      return;
-    }
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!isEmailValid) return setInvalidAdmin("Invalid email format");
 
-    // Set loading true saat pencarian dimulai
     setLoading(true);
-
-    // Jika valid, lanjutkan dengan proses pencarian admin
     if (abortController) abortController.abort();
     const controller = new AbortController();
     setAbortController(controller);
@@ -89,134 +78,142 @@ export default function CreateMajor() {
         headers: { Authorization: `Bearer ${authToken}` },
         signal: controller.signal,
       });
-
-      setLoading(false);  // Set loading false setelah mendapatkan response
-
-      if (res.data?.status === "success") {
-        setAdminMessage(res.data.message);
-        setAdmin(res.data.admin);
-      } else {
-        setAdminMessage(res.data.message);
+      setAdminMessage(res.data.message);
+      setAdmin(res.data.status === "success" ? res.data.admin : { id: null, email: "" });
+    } catch (error: any) {
+      if (error.name !== "CanceledError") {
+        setAdminMessage(error?.response?.data?.message || "Failed to fetch admin");
         setAdmin({ id: null, email: "" });
       }
-    } catch (error: any) {
-      setLoading(false);  // Set loading false jika error
-      if (error.name === "CanceledError" || error.code === "ERR_CANCELED") return;
-      console.error("search error", error);
-      setAdminMessage(error?.response?.data?.message);
-      setAdmin({ id: null, email: "" });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const email = e.target.value;
-    setSearchEmail(email);
-    searchAdmin(email);
+  const resetAdmin = () => {
+    setAdmin({ id: null, email: "" });
+    setAdminMessage("");
+    setLoading(false);
+  };
+
+  const setInvalidAdmin = (message: string) => {
+    setAdmin({ id: null, email: "" });
+    setAdminMessage(message);
+    setLoading(false);
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (!admin.id) {
+      setAdminMessage("Please select an admin first");
+      return;
+    }
+
+    const formData = new FormData(e.currentTarget);
+    ["logo", "banner"].forEach(name => {
+      const input = e.currentTarget.querySelector<HTMLInputElement>(`input[type="file"][name="${name}"]`);
+      if (input?.files?.[0]) formData.append(name, input.files[0]);
+    });
+
+    try {
+      const res = await useAxios.post("/major/create", formData, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      const { message } = res.data;
+      toast.success(message)
+      router.push('/major');
+    } catch (error: any) {
+      setErrorMessage(error);
+      toast.error(error);
+      console.error("Create major error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div>
       <PageBreadcrumb pageTitle="Create New Major" />
       <ComponentCard title="Major Form" desc="Please complete the form to create a new major">
-        <form onSubmit={handleSubmit}>
-          {/* Search Admin */}
-          <div>
-            <Label>Search Admin</Label>
+        <form onSubmit={handleSubmit} className="space-y-6">
+
+          {/* Admin Selection */}
+          <FormInputGroup title="Choose Admin" description="Search admin by email">
+            <Label>Admin</Label>
             <Input
               type="text"
               name="adminEmail"
               placeholder="Search admin by email"
-              onChange={handleEmailChange}
               value={searchEmail}
+              onChange={handleEmailAdminChange}
             />
-            {loading && (
-              <div className="flex items-center space-x-2 mt-1 text-sm text-gray-600">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500"></div>
-                <span>Mencari...</span>
-              </div>
-            )}
-            {adminMessage && (
-              <p className={`mt-1 text-sm ${admin.id ? "text-green-500" : "text-red-500"}`}>
-                {adminMessage}
-              </p>
-            )}
-            {/* Hidden admin_id */}
-            {admin.id && (
-              <input type="hidden" name="admin_id" value={admin.id} />
-            )}
-          </div>
+            {loading && 
+            <Loader/>
+            }
+            {adminMessage && <p className={`text-sm mt-2 ${admin.id ? "text-green-500" : "text-red-500"}`}>{adminMessage}</p>}
+            {admin.id && <input type="hidden" name="admin_id" value={admin.id} />}
+          </FormInputGroup>
 
-          {/* Major Fields */}
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <div>
-              <Label>Logo</Label>
-              <FileInput className="custom-class" onChange={handleLogoChange} />
-              {logoPreview && (
-                <Image
-                  src={logoPreview}
-                  alt="Logo Preview"
-                  className="mt-2 h-24 w-auto rounded border"
-                  width={300}
-                  height={300}
-                />
-              )}
-            </div>
+          {/* Logo Upload */}
+          <FormInputGroup title="Logo" description="Upload logo">
+            <Image
+              src={logoPreview || "/images/default-image.webp"}
+              alt="Logo Preview"
+              className="h-32 w-32 rounded-full border object-cover"
+              width={128}
+              height={128}
+            />
+            <Label>Logo</Label>
+            <FileInput name="logo" onChange={e => handleFileChange(e, setLogoPreview)} />
+          </FormInputGroup>
 
-            <div>
-              <Label>Banner</Label>
-              <FileInput className="custom-class" onChange={handleBannerChange} />
-              {bannerPreview && (
-                <Image
-                  src={bannerPreview}
-                  alt="Banner Preview"
-                  className="mt-2 h-24 w-full object-cover rounded border"
-                  width={300}
-                  height={300}
-                />
-              )}
-            </div>
+          {/* Banner Upload */}
+          <FormInputGroup title="Banner" description="Upload banner">
+            <Image
+              src={bannerPreview || "/images/default-image.webp"}
+              alt="Banner Preview"
+              className="w-full aspect-video rounded border object-cover"
+              width={1280}
+              height={720}
+            />
+            <Label>Banner</Label>
+            <FileInput name="banner" onChange={e => handleFileChange(e, setBannerPreview)} />
+          </FormInputGroup>
 
-            <div>
-              <Label>Name</Label>
-              <Input
-                type="text"
-                name="name"
-                placeholder="Enter major name"
-                onChange={handleNameChange}
-              />
-            </div>
+          {/* Major Name */}
+          <FormInputGroup title="Major Name" description="Fill major name">
+            <Label>Major Name</Label>
+            <Input name="name" placeholder="Enter major name" onChange={handleNameChange} error={!!errorMessage} hint={errorMessage} />
+          </FormInputGroup>
 
-            <div>
-              <Label>Slug</Label>
-              <Input
-                type="text"
-                name="slug"
-                placeholder="e.g. computer_science"
-                value={slug}
-                readOnly
-                disabled
-              />
-            </div>
+          {/* Slug */}
+          <FormInputGroup title="Slug" description="Generated automatically">
+            <Label>Slug</Label>
+            <Input name="slug" value={slug} readOnly disabled error={!!errorMessage} hint={errorMessage} />
+          </FormInputGroup>
 
-            <div>
-              <Label>Acronym</Label>
-              <Input
-                type="text"
-                name="acronim"
-                placeholder="e.g. CS"
-                value={acronim}
-                readOnly
-                disabled
-              />
-            </div>
+          {/* Acronym */}
+          <FormInputGroup title="Acronym" description="Generated automatically">
+            <Label>Acronym</Label>
+            <Input name="acronim" value={acronym} readOnly disabled error={!!errorMessage} hint={errorMessage} />
+          </FormInputGroup>
 
-            <div className="col-span-2">
-              <Label>Description</Label>
-              <TextArea
-                placeholder="Optional: Add a description for this major"
-                rows={4}
-              />
-            </div>
+          {/* Description */}
+          <FormInputGroup title="Description" description="Short major description">
+            <Label>Description</Label>
+            <TextArea name="description" value={description} onChange={setDescription} error={!!errorMessage} hint={errorMessage} />
+          </FormInputGroup>
+
+          {/* Submit Button */}
+          <div className="grid grid-cols-3">
+            <div></div>
+            <Button className="w-full" disabled={loading}>{loading ? "Loading..." : "Create new major"}</Button>
+            <div></div>
           </div>
         </form>
       </ComponentCard>

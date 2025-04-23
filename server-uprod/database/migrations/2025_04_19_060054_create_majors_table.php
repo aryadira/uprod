@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('admin_id')->nullable();
 
-            $table->string('slug');
+            $table->string('slug')->unique();
             $table->string('logo_path', 100)->nullable();
             $table->string('banner_path', 100)->nullable();
             $table->string('name', 100);

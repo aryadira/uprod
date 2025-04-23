@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\V1\AuthController;
+use App\Http\Controllers\V1\MajorController;
 use App\Http\Controllers\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,7 +24,10 @@ Route::prefix('v1')->name('v1.')->group(function () {
         });
 
         Route::middleware('role:superadmin,admin')->group(function () {
-
+            Route::prefix('major')->name('major.')->group(function () {
+                Route::get('/', [MajorController::class, 'getAll'])->name('all');
+                Route::post('/create', [MajorController::class, 'createMajor'])->name('create');
+            });
         });
 
         Route::middleware('role:customer')->group(function () {
