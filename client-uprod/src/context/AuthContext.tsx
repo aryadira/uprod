@@ -106,18 +106,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         switch (user.role) {
           case 'customer':
             router.push('/homepage');
+            toast.success(message);
+            toast.success(`Welcome ${user.name}`);
             break;
           case 'superadmin':
           case 'admin':
             router.push('/');
+            toast.success(message);
+            toast.success(`Welcome ${user.name}`);
             break;
           default:
             router.push('/unauthorized');
             break;
         }
-
-        toast.success(message);
-        toast.success(`Welcome ${user.name}`);
 
       } else {
         setAuthToken(null);
