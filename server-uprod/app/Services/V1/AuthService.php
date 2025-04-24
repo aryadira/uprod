@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
+    public const USER_NOT_REGISTERED = 'user_not_registered';
+
     public function __construct(protected AuthRepository $authRepository)
     {
     }
@@ -41,29 +43,28 @@ class AuthService
         return $user;
     }
 
-    public function authenticate($credentials): string|null
+    public function authenticate(array $credentials): ?string
     {
-        $email = $credentials['email'];
-        $password = $credentials['password'];
-
-        if (!isset($email, $password)) {
+        if (empty($credentials['email']) || empty($credentials['password'])) {
             return null;
         }
 
-        $userAuth = $this->authRepository->findByEmail($email);
+        $user = $this->authRepository->findByEmail($credentials['email']);
 
-        if (!$userAuth || !Hash::check($password, $userAuth->password)) {
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return null;
         }
 
-        if ($userAuth->role === 'admin' && $userAuth->majors()->count() === 0) {
-            Auth::logout();
-            return response()->json(['message' => 'Admin belum terdaftar di major'], 403);
+        if ($this->isUnregisteredAdmin($user)) {
+            return self::USER_NOT_REGISTERED;
         }
 
-        $token = $userAuth->createToken('auth_token')->plainTextToken;
+        return $user->createToken('auth_token')->plainTextToken;
+    }
 
-        return $token;
+    private function isUnregisteredAdmin($user): bool
+    {
+        return $user->user_role_id === 2 && $user->majors()->count() === 0;
     }
 
     public function signout($currentUser)

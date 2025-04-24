@@ -28,21 +28,19 @@ class MajorController extends Controller
     {
         $validated = $request->validate([
             'admin_id' => ['required'],
-            'logo_path' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-            'banner_path' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:4096'],
+            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'banner' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:4096'],
             'name' => ['required', 'string', 'max:100', 'unique:majors,name'],
             'description' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        if ($request->hasFile('logo_path')) {
-            $validated['logo_path'] = $request->file('logo_path')->store('majors/logos', 'public');
+        if ($request->hasFile('logo')) {
+            $validated['logo_path'] = $request->file('logo')->store('majors/logos', 'public');
         }
 
-        if ($request->hasFile('banner_path')) {
-            $validated['banner_path'] = $request->file('banner_path')->store('majors/banners', 'public');
+        if ($request->hasFile('banner')) {
+            $validated['banner_path'] = $request->file('banner')->store('majors/banners', 'public');
         }
-
-        dd($validated);
 
         $newMajor = $this->majorService->createMajor($validated);
 

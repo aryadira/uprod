@@ -17,10 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'role' => RoleMiddleware::class,
-            'cors' => HandleCors::class,
+            // 'cors' => HandleCors::class,
             'sanctum' => EnsureFrontendRequestsAreStateful::class
         ]);
-        $middleware->append(HandleCors::class);
+        // $middleware->append(HandleCors::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

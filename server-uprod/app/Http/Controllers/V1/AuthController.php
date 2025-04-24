@@ -7,7 +7,9 @@ use App\Http\Requests\V1\UserLoginRequest;
 use App\Http\Requests\V1\UserRegisterRequest;
 use App\Services\V1\API\APIResponseService;
 use App\Services\V1\AuthService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -26,22 +28,30 @@ class AuthController extends Controller
         return $this->apiResponseService->sendSuccess('Sign up successfully!', $newUser);
     }
 
-    public function signin(UserLoginRequest $request)
+    public function signin(UserLoginRequest $request): JsonResponse
     {
         $credentials = $request->validated();
 
-        $authenticate = $this->authService->authenticate($credentials);
+        $token = $this->authService->authenticate($credentials);
 
-        if (!$authenticate) {
+        if ($token === AuthService::USER_NOT_REGISTERED) {
+            Auth::logout();
+            return response()->json([
+                'message' => 'Admin belum terdaftar di major',
+            ], 403);
+        }
+
+        if (!$token) {
             return $this->apiResponseService->sendError('Invalid email or password');
         }
 
-        return response()->json([   
+        return response()->json([
             'status' => 'success',
             'message' => 'Sign in successfully!',
-            'token' => $authenticate
+            'token' => $token,
         ]);
     }
+
 
     public function signout(Request $request)
     {

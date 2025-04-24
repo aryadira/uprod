@@ -25,7 +25,7 @@ export default function CreateMajor() {
 
   // State
   const [searchEmail, setSearchEmail] = useState("");
-  const [admin, setAdmin] = useState({ id: null, email: "" });
+  const [adminData, setAdminData] = useState({ id: null, email: "" });
   const [adminMessage, setAdminMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -70,9 +70,9 @@ export default function CreateMajor() {
   };
 
   const handleEmailAdminChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const email = e.target.value;
-    setSearchEmail(email);
-    searchAdmin(email);
+    const adminEmail = e.target.value;
+    setSearchEmail(adminEmail);
+    searchAdmin(adminEmail);
   };
 
   const searchAdmin = async (email: string) => {
@@ -82,6 +82,7 @@ export default function CreateMajor() {
     if (!isValidEmail) return setInvalidAdmin("Invalid email format");
 
     setLoading(true);
+
     if (abortController) abortController.abort();
     const controller = new AbortController();
     setAbortController(controller);
@@ -92,12 +93,25 @@ export default function CreateMajor() {
         signal: controller.signal,
       });
 
-      setAdminMessage(res.data.message);
-      setAdmin(res.data.status === "success" ? res.data.admin : { id: null, email: "" });
+      const { status, message, admin } = res.data;
+
+      switch(status) {
+        case "success":
+          setAdminData(admin);
+          setAdminMessage(message);
+          break;
+        case "error":
+          setAdminMessage(message);
+          break;
+        default:
+          resetAdmin();
+          break;
+      }
+      
     } catch (error: any) {
       if (error.name !== "CanceledError") {
         setAdminMessage(error?.response?.data?.message || "Failed to fetch admin");
-        setAdmin({ id: null, email: "" });
+        setAdminData({ id: null, email: "" });
       }
     } finally {
       setLoading(false);
@@ -105,39 +119,39 @@ export default function CreateMajor() {
   };
 
   const resetAdmin = () => {
-    setAdmin({ id: null, email: "" });
+    setAdminData({ id: null, email: "" });
     setAdminMessage("");
     setLoading(false);
   };
 
   const setInvalidAdmin = (message: string) => {
-    setAdmin({ id: null, email: "" });
+    setAdminData({ id: null, email: "" });
     setAdminMessage(message);
     setLoading(false);
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!admin.id) return setAdminMessage("Please select an admin first");
+    if (!adminData.id) return setAdminMessage("Please select an admin first");
 
     setLoading(true);
-    const formData = new FormData(e.currentTarget);
 
-    // Append manually generated data
+    const formData = new FormData();
+    formData.append("admin_id", String(adminData.id));
+    formData.append("name", formDataState.name);
     formData.append("slug", formDataState.slug);
-    formData.append("acronim", formDataState.acronym);
+    formData.append("acronym", formDataState.acronym);
     formData.append("description", formDataState.description);
 
-    // Append selected admin
-    formData.append("adminId", String(admin.id));
-
-    // Append files
     if (logoRef.current?.files?.[0]) {
-      formData.append("logo", logoRef.current.files[0]);
+      formData.append("logo_path", logoRef.current.files[0]);
     }
+
     if (bannerRef.current?.files?.[0]) {
-      formData.append("banner", bannerRef.current.files[0]);
+      formData.append("banner_path", bannerRef.current.files[0]);
     }
+
+    console.log(formData)
 
     try {
       const res = await useAxios.post("/major/create", formData, {
@@ -175,11 +189,11 @@ export default function CreateMajor() {
             />
             {loading && <Loader />}
             {adminMessage && (
-              <p className={`text-sm mt-2 ${admin.id ? "text-green-500" : "text-red-500"}`}>
+              <p className={`text-sm mt-2 ${adminData.id ? "text-green-500" : "text-red-500"}`}>
                 {adminMessage}
               </p>
             )}
-            {admin.id && <input type="hidden" name="admin_id" value={admin.id} />}
+            {adminData.id && <input type="hidden" name="admin_id" value={adminData.id} />}
           </FormInputGroup>
 
           <FormInputGroup title="Logo" description="Upload logo">
@@ -191,7 +205,7 @@ export default function CreateMajor() {
               height={128}
             />
             <Label>Logo</Label>
-            <FileInput name="logo" ref={logoRef} onChange={(e) => handleFileChange(e, setLogoPreview)} />
+            <FileInput name="logo_path" ref={logoRef} onChange={(e) => handleFileChange(e, setLogoPreview)} />
           </FormInputGroup>
 
           <FormInputGroup title="Banner" description="Upload banner">
@@ -203,7 +217,7 @@ export default function CreateMajor() {
               height={720}
             />
             <Label>Banner</Label>
-            <FileInput name="banner" ref={bannerRef} onChange={(e) => handleFileChange(e, setBannerPreview)} />
+            <FileInput name="banner_path" ref={bannerRef} onChange={(e) => handleFileChange(e, setBannerPreview)} />
           </FormInputGroup>
 
           <FormInputGroup title="Major Name" description="Fill major name">
@@ -225,7 +239,7 @@ export default function CreateMajor() {
 
           <FormInputGroup title="Acronym" description="Generated automatically">
             <Label>Acronym</Label>
-            <Input name="acronim" value={formDataState.acronym} readOnly disabled />
+            <Input name="acronym" value={formDataState.acronym} readOnly disabled />
           </FormInputGroup>
 
           <FormInputGroup title="Description" description="Short major description">

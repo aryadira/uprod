@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const user = res.data.user;
         setCurrentUser(user);
       } catch (err) {
-        console.error("Failed to fetch user", err);
+        console.error("Something wrong", err);
         setCurrentUser(null);
         setAuthToken(null);
       } finally {
