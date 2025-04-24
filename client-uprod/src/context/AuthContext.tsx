@@ -48,6 +48,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessages, setErrorMessages] = useState<ErrorMessageType>(null);
 
+  // const csrf = () => useAxios.get("/sanctum/csrf-cookie")
+
   useEffect(() => {
     const storedToken = Cookies.get("authToken");
     if (storedToken) {
@@ -56,8 +58,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [router]);
 
-  // Ambil current user berdasarkan token
   useEffect(() => {
+    // Ambil current user berdasarkan token
     const fetchUser = async () => {
       try {
         const res = await useAxios.get("/user/current", {
@@ -111,7 +113,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             break;
           case 'superadmin':
           case 'admin':
-            router.push('/');
+            router.push('/dashboard');
             toast.success(message);
             toast.success(`Welcome ${user.name}`);
             break;

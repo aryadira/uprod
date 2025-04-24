@@ -42,6 +42,8 @@ class MajorController extends Controller
             $validated['banner_path'] = $request->file('banner_path')->store('majors/banners', 'public');
         }
 
+        dd($validated);
+
         $newMajor = $this->majorService->createMajor($validated);
 
         return response()->json([

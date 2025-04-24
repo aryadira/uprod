@@ -56,6 +56,11 @@ class AuthService
             return null;
         }
 
+        if ($userAuth->role === 'admin' && $userAuth->majors()->count() === 0) {
+            Auth::logout();
+            return response()->json(['message' => 'Admin belum terdaftar di major'], 403);
+        }
+
         $token = $userAuth->createToken('auth_token')->plainTextToken;
 
         return $token;

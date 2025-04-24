@@ -23,11 +23,14 @@ import {
   UserCircleIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
+import { useAuth } from "@/context/AuthContext";
+import Loader from "@/components/common/Loader";
 
 type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
+  roles: string[];
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
@@ -35,104 +38,93 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    path:'/'
+    path: '/dashboard',
+    roles: ['superadmin', 'admin']
   },
   {
-    icon: <FolderIcon/>,
+    icon: <FolderIcon />,
     name: "Management",
+    roles: ['admin'],
     subItems: [
-      {
-        name: "Product",
-        path: "/product",
-        pro: false
-      },
-      {
-        name: "Service",
-        path: "/service",
-        pro: false
-      },
-      {
-        name: "Customer",
-        path: "/customer",
-        pro: false
-      },
-      {
-        name: "Major",
-        path: "/major",
-        pro: false
-      }
+      { name: "Product", path: "/product", pro: false },
+      { name: "Service", path: "/service", pro: false },
+      { name: "Customer", path: "/customer", pro: false },
     ]
   },
   {
-    icon: <GridIcon/>,
+    icon: <FolderIcon />,
+    name: "Major",
+    path: "/major",
+    roles: ['superadmin'],
+  },
+  {
+    icon: <GridIcon />,
     name: "Category",
+    roles: ['superadmin'],
     subItems: [
-      {
-        name: "Product Category",
-        path: "/product",
-        pro: false
-      },
-      {
-        name: "Service Category",
-        path: "/category/service",
-        pro: false
-      },
-      {
-        name: "WO Category",
-        path: "/service",
-        pro: false
-      },
+      { name: "Product Category", path: "/product", pro: false },
+      { name: "Service Category", path: "/category/service", pro: false },
+      { name: "WO Category", path: "/service", pro: false },
     ]
   },
   {
-    icon: <TaskIcon/>,
+    icon: <TaskIcon />,
     name: "Work Order",
     path: "/wo",
+    roles: ['admin']
   },
   {
     icon: <BoxCubeIcon />,
     name: "Order",
     path: "/order",
+    roles: ['admin']
   },
   {
     icon: <FileIcon />,
     name: "Invoice",
     path: "/order",
+    roles: ['admin']
   },
   {
     icon: <DollarLineIcon />,
     name: "Transaction",
     path: "/transaction",
+    roles: ['admin']
   },
   {
     icon: <ErrorIcon />,
     name: "Complaint",
     path: "/complaint",
+    roles: ['admin']
   },
   {
     icon: <CalenderIcon />,
     name: "Calendar",
     path: "/calendar",
+    roles: ['admin']
   },
   {
     icon: <UserCircleIcon />,
     name: "User Profile",
     path: "/profile",
+    roles: ['admin', 'superadmin']
   },
-
   {
     name: "Forms",
     icon: <ListIcon />,
+    roles: ['admin', 'superadmin'],
     subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
   },
   {
     name: "Tables",
     icon: <TableIcon />,
+    roles: ['admin', 'superadmin'],
     subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
   },
   {
     name: "Pages",
     icon: <PageIcon />,
+    roles: ['admin', 'superadmin'],
     subItems: [
       { name: "Blank Page", path: "/blank", pro: false },
       { name: "404 Error", path: "/error-404", pro: false },
@@ -144,6 +136,7 @@ const othersItems: NavItem[] = [
   {
     icon: <PieChartIcon />,
     name: "Charts",
+    roles: ['admin', 'superadmin'],
     subItems: [
       { name: "Line Chart", path: "/line-chart", pro: false },
       { name: "Bar Chart", path: "/bar-chart", pro: false },
@@ -152,6 +145,7 @@ const othersItems: NavItem[] = [
   {
     icon: <BoxCubeIcon />,
     name: "UI Elements",
+    roles: ['admin', 'superadmin'],
     subItems: [
       { name: "Alerts", path: "/alerts", pro: false },
       { name: "Avatar", path: "/avatars", pro: false },
@@ -164,6 +158,7 @@ const othersItems: NavItem[] = [
   {
     icon: <PlugInIcon />,
     name: "Authentication",
+    roles: ['admin', 'superadmin'],
     subItems: [
       { name: "Sign In", path: "/signin", pro: false },
       { name: "Sign Up", path: "/signup", pro: false },
@@ -171,9 +166,32 @@ const othersItems: NavItem[] = [
   },
 ];
 
+
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+  const { currentUser } = useAuth();
+
+  const role = currentUser?.role;
+
+  function filterNavItemsByRole(items: NavItem[], role: string): NavItem[] {
+    return items
+      .filter((item) => {
+        // kalau item punya roles, pastikan user role termasuk
+        if (item.roles && !item.roles.includes(role)) return false;
+
+        // // jika punya subItems, filter juga subItems-nya
+        // if (item.subItems) {
+        //   item.subItems = item.subItems.filter(
+        //     (sub) => !sub.roles || sub.roles.includes(role)
+        //   );
+        //   // kalau setelah difilter subItems jadi kosong, skip item ini
+        //   if (item.subItems.length === 0) return false;
+        // }
+
+        return true;
+      });
+  }
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -186,8 +204,8 @@ const AppSidebar: React.FC = () => {
             <button
               onClick={() => handleSubmenuToggle(index, menuType)}
               className={`menu-item group  ${openSubmenu?.type === menuType && openSubmenu?.index === index
-                  ? "menu-item-active"
-                  : "menu-item-inactive"
+                ? "menu-item-active"
+                : "menu-item-inactive"
                 } cursor-pointer ${!isExpanded && !isHovered
                   ? "lg:justify-center"
                   : "lg:justify-start"
@@ -195,8 +213,8 @@ const AppSidebar: React.FC = () => {
             >
               <span
                 className={` ${openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? "menu-item-icon-active"
-                    : "menu-item-icon-inactive"
+                  ? "menu-item-icon-active"
+                  : "menu-item-icon-inactive"
                   }`}
               >
                 {nav.icon}
@@ -207,9 +225,9 @@ const AppSidebar: React.FC = () => {
               {(isExpanded || isHovered || isMobileOpen) && (
                 <ChevronDownIcon
                   className={`ml-auto size-5 transition-transform duration-200  ${openSubmenu?.type === menuType &&
-                      openSubmenu?.index === index
-                      ? "rotate-180 text-brand-500"
-                      : ""
+                    openSubmenu?.index === index
+                    ? "rotate-180 text-brand-500"
+                    : ""
                     }`}
                 />
               )}
@@ -223,8 +241,8 @@ const AppSidebar: React.FC = () => {
               >
                 <span
                   className={`${isActive(nav.path)
-                      ? "menu-item-icon-active"
-                      : "menu-item-icon-inactive"
+                    ? "menu-item-icon-active"
+                    : "menu-item-icon-inactive"
                     }`}
                 >
                   {nav.icon}
@@ -254,8 +272,8 @@ const AppSidebar: React.FC = () => {
                     <Link
                       href={subItem.path}
                       className={`menu-dropdown-item ${isActive(subItem.path)
-                          ? "menu-dropdown-item-active"
-                          : "menu-dropdown-item-inactive"
+                        ? "menu-dropdown-item-active"
+                        : "menu-dropdown-item-inactive"
                         }`}
                     >
                       {subItem.name}
@@ -263,8 +281,8 @@ const AppSidebar: React.FC = () => {
                         {subItem.new && (
                           <span
                             className={`ml-auto ${isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
+                              ? "menu-dropdown-badge-active"
+                              : "menu-dropdown-badge-inactive"
                               } menu-dropdown-badge `}
                           >
                             new
@@ -273,8 +291,8 @@ const AppSidebar: React.FC = () => {
                         {subItem.pro && (
                           <span
                             className={`ml-auto ${isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
+                              ? "menu-dropdown-badge-active"
+                              : "menu-dropdown-badge-inactive"
                               } menu-dropdown-badge `}
                           >
                             pro
@@ -408,8 +426,8 @@ const AppSidebar: React.FC = () => {
             <div>
               <h2
                 className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
+                  ? "lg:justify-center"
+                  : "justify-start"
                   }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
@@ -418,23 +436,23 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(navItems, "main")}
+              {!role ? <Loader text="Load content..."/> : renderMenuItems(filterNavItemsByRole(navItems, role!), "main")}
             </div>
 
             <div className="">
               <h2
                 className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
+                  ? "lg:justify-center"
+                  : "justify-start"
                   }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
                   "Others"
                 ) : (
-                  <HorizontaLDots />
+                <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(othersItems, "others")}
+              {!role ? <Loader text="Load content..." /> : renderMenuItems(filterNavItemsByRole(othersItems, role!), "others")}
             </div>
           </div>
         </nav>

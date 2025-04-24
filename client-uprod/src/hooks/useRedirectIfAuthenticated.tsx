@@ -14,7 +14,7 @@ export default function useRedirectIfAuthenticated() {
           break;
         case "admin":
         case "superadmin":
-          router.replace("/");
+          router.replace("/dashboard");
           break;
         default:
           router.replace("/404");

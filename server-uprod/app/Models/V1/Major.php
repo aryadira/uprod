@@ -10,15 +10,13 @@ class Major extends Model
 
     protected $fillable = [
         'admin_id',
-        'created_by',
         'slug',
-        'code',
         'logo_path',
         'banner_path',
         'name',
         'acronim',
         'description',
-        'is_active'
+        // 'is_active'
     ];
 
     public function user()

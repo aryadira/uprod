@@ -38,6 +38,11 @@ class User extends Authenticatable
         return $this->user_role()->where('role_name', $role)->exists();
     }
 
+    public function majors()
+    {
+        return $this->hasMany(Major::class, 'admin_id');
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
