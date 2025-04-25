@@ -148,6 +148,7 @@ export default function CreateMajor() {
     setIsLoading(true);
 
     const formData = new FormData();
+
     formData.append("admin_id", String(adminData.id));
     formData.append("name", formInput.name);
     formData.append("slug", formInput.slug);
@@ -156,10 +157,12 @@ export default function CreateMajor() {
 
     if (formInput.logo_path) {
       formData.append("logo_path", formInput.logo_path);
+      // formData.append('logo_url', URL.createObjectURL(formInput.logo_path))
     }
 
     if (formInput.banner_path) {
       formData.append("banner_path", formInput.banner_path);
+      //  formData.append('logo_url', URL.createObjectURL(formInput.banner_path))
     }
 
     try {
@@ -189,6 +192,7 @@ export default function CreateMajor() {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div>

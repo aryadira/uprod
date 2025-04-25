@@ -36,12 +36,14 @@ class MajorController extends Controller
 
         if ($request->hasFile('logo_path') && $request->file('logo_path')->isValid()) {
             $logoName = time() . '_logo_' . $request->file('logo_path')->getClientOriginalName();
-            $validated['logo_path'] = $request->file('logo_path')->store('uploads/major/logo', 'public');
+            $request->file('logo_path')->move(public_path('uploads/major/logo'), $logoName);
+            $validated['logo_path'] = 'uploads/major/logo/' . $logoName;
         }
 
         if ($request->hasFile('banner_path') && $request->file('banner_path')->isValid()) {
             $bannerName = time() . '_banner_' . $request->file('banner_path')->getClientOriginalName();
-            $validated['banner_path'] = $request->file('banner_path')->store('uploads/major/banner', 'public');
+            $request->file('banner_path')->move(public_path('uploads/major/banner'), $bannerName);
+            $validated['banner_path'] = 'uploads/major/banner/' . $bannerName;
         }
 
         $newMajor = $this->majorService->createMajor($validated);

@@ -51,12 +51,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // const csrf = () => useAxios.get("/sanctum/csrf-cookie")
 
   useEffect(() => {
-    const storedToken = Cookies.get("authToken");
-    if (storedToken) {
-      setAuthToken(storedToken);
-      router.forward()
+  if (typeof window !== 'undefined') {
+      const storedToken = Cookies.get("authToken");
+      if (storedToken) {
+        setAuthToken(storedToken);
+      } else {
+        setIsLoading(false); // jika token tidak ada, set loading false
+      }
     }
-  }, [router]);
+  }, []);
 
   useEffect(() => {
     // Ambil current user berdasarkan token
