@@ -14,11 +14,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Admin } from "../type";
+import Badge from "@/components/ui/badge/Badge";
 
 const HEADER_CELLS = [
   "No.",
   "Admin Name",
   "Email",
+  "Is Assigned",
   "Action"
 ];
 
@@ -66,6 +68,9 @@ const TableAdmin = () => {
         </TableCell>
         <TableCell className="px-4 py-3 text-theme-sm text-gray-800 dark:text-white/90">
           {admin.email}
+        </TableCell>
+        <TableCell className="px-4 py-3 text-theme-sm text-gray-800 dark:text-white/90">
+          <Badge color={admin.is_assigned == "assigned" ? "success" : "error"}>{admin.is_assigned}</Badge>
         </TableCell>
         <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-400">
           <Button variant="outline" type="link" href={`/user/admin/${admin.id}`}>Detail</Button>

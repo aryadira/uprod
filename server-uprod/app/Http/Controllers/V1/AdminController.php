@@ -15,6 +15,13 @@ class AdminController extends Controller
             ->select('id', 'name', 'email')
             ->get();
 
+        // Tambahkan informasi apakah admin sudah digunakan
+        $admins = $admins->map(function ($admin) {
+            $isAdminUsed = Major::query()->where('admin_id', $admin->id)->exists();
+            $admin->is_assigned = $isAdminUsed ? 'assigned' : 'unassigned';
+            return $admin;
+        });
+
         return response()->json([
             'status' => 'success',
             'message' => 'Get all admin!',
@@ -22,11 +29,12 @@ class AdminController extends Controller
         ]);
     }
 
-    public function getById($id) {
+    public function getById($id)
+    {
         $admin = User::query()->where('user_role_id', 2)
             ->where('id', $id)
             ->first();
-            
+
         return response()->json([
             'status' => 'success',
             'message' => 'Get single admin!',
