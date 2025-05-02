@@ -57,7 +57,7 @@ class AdminController extends Controller
             if ($isAdminUsed) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Admin sudah digunakan di major ini.',
+                    'message' => 'Admin sudah digunakan.',
                 ]);
             } else {
                 return response()->json([

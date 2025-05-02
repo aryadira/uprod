@@ -20,8 +20,8 @@ Route::prefix('v1')->name('v1.')->group(function () {
             
             // ADMIN
             Route::get('/admin', [AdminController::class, 'getAll'])->name('admin');
-            Route::get('/admin/{id}', [AdminController::class, 'getById'])->name('admin.show');
             Route::get('/admin/search', [AdminController::class, 'searchAdminByEmail'])->name('admin.search');
+            Route::get('/admin/{id}', [AdminController::class, 'getById'])->name('admin.show');
         });
 
         Route::middleware('role:superadmin,admin')->group(function () {
