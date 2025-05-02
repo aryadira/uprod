@@ -58,6 +58,12 @@ const navItems: NavItem[] = [
     roles: ['superadmin'],
   },
   {
+    icon: <UserCircleIcon />,
+    name: "Admin",
+    path: "/user/admin",
+    roles: ['superadmin'],
+  },
+  {
     icon: <GridIcon />,
     name: "Category",
     roles: ['superadmin'],

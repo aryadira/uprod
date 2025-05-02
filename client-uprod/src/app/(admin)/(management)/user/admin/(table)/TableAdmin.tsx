@@ -1,13 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import useAxios from "@/hooks/useAxios";
 import { useAuth } from "@/context/AuthContext";
 import Loader from "@/components/common/Loader";
-// import RefreshButton from "@/components/common/RefreshButton";
 import Button from "@/components/ui/button/Button";
-import { Major } from "../type";
 
 import {
   Table,
@@ -16,32 +13,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Admin } from "../type";
 
 const HEADER_CELLS = [
   "No.",
-  "Logo",
-  "Major Name",
-  "Email",
-  "Acronim",
   "Admin Name",
+  "Email",
   "Action"
 ];
 
-const TableMajor = () => {
+const TableAdmin = () => {
   const { authToken } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
-  const [majors, setMajors] = useState<Major[]>([]);
+  const [admins, setAdmins] = useState<Admin[]>([]);
   const [isMounted, setIsMounted] = useState(false); // fix hydration
 
-  const fetchMajors = async () => {
+  const fetchAdmins = async () => {
     setIsLoading(true);
     try {
-      const res = await useAxios.get("/major", {
+      const res = await useAxios.get("/user/admin", {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
-      setMajors(res.data.major);
+      setAdmins(res.data.admins);
     } catch (err) {
       console.error(err);
     } finally {
@@ -51,53 +46,29 @@ const TableMajor = () => {
 
   useEffect(() => {
     setIsMounted(true); // hydration fix
-    if (authToken) fetchMajors();
+    if (authToken) fetchAdmins();
   }, [authToken]);
 
   if (!isMounted) return null; // prevent hydration mismatch
 
   // const handleRefresh = () => {
-  //   fetchMajors();
+  //   fetchAdmins();
   // }
 
   const renderTableBody = () =>
-    majors.map((major, index) => (
-      <TableRow key={major.id}>
+    admins.map((admin, index) => (
+      <TableRow key={admin.id}>
         <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-400">
           {index + 1}
         </TableCell>
-        <TableCell className="px-5 py-4 sm:px-6 text-start">
-          <div className="w-15 h-15 overflow-hidden rounded-md bg-gray-100 flex items-center justify-center">
-            {major.logo_path ? (
-              <Image
-                width={40}
-                height={40}
-                src={`${process.env.NEXT_PUBLIC_SERVER_URL}/${major.logo_path}`}
-                alt={major.name}
-                className="object-cover w-full h-full" // Menjaga proporsi gambar
-                unoptimized
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
-                No Logo
-              </div>
-            )}
-          </div>
+        <TableCell className="px-4 py-3 text-theme-sm text-gray-800 dark:text-white/90">
+          {admin.name}
         </TableCell>
         <TableCell className="px-4 py-3 text-theme-sm text-gray-800 dark:text-white/90">
-          {major.name}
-        </TableCell>
-        <TableCell className="px-4 py-3 text-theme-sm text-gray-800 dark:text-white/90">
-          {major.user?.email}
-        </TableCell>
-        <TableCell className="px-4 py-3 text-theme-sm text-gray-800 dark:text-white/90">
-          {major.acronim}
+          {admin.email}
         </TableCell>
         <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-400">
-          {major.user?.name ?? "-"}
-        </TableCell>
-        <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-400">
-          <Button variant="outline" type="link" href={`/major/${major.slug}`}>Detail</Button>
+          <Button variant="outline" type="link" href={`/user/admin/${admin.id}`}>Detail</Button>
         </TableCell>
       </TableRow>
     ));
@@ -106,13 +77,13 @@ const TableMajor = () => {
     <div className="w-full flex flex-col items-center justify-center p-12 gap-5">
       <div className="text-center">
         <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
-          You havent added a major
+          You havent added a admin
         </h3>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Please create the first major below!
+          Please create the first admin below!
         </p>
       </div>
-      <Button type="link" href="/major/create">
+      <Button type="link" href="/admin/create">
         Go to create
       </Button>
     </div>
@@ -124,11 +95,11 @@ const TableMajor = () => {
         <RefreshButton onClick={handleRefresh} />
       </div> */}
       <div className="max-w-full overflow-x-auto">
-        {isLoading && majors.length === 0 ? (
+        {isLoading && admins.length === 0 ? (
           <div className="w-full flex items-center justify-center p-10">
             <Loader />
           </div>
-        ) : majors.length === 0 ? (
+        ) : admins.length === 0 ? (
           renderEmptyState()
         ) : (
           <div className="min-w-[1000px]">
@@ -157,4 +128,4 @@ const TableMajor = () => {
   );
 };
 
-export default TableMajor;
+export default TableAdmin;

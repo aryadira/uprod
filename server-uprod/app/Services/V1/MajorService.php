@@ -21,6 +21,10 @@ class MajorService
         return $this->majorRepository->getAll();
     }
 
+    public function getBySlug($slug) {
+        return $this->majorRepository->findById($slug);
+    }
+
     public function getByLimit(int $limit = 10)
     {
         return $this->majorRepository->getByLimit($limit);

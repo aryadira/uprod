@@ -38,18 +38,19 @@
   --color-white: #ffffff;
   --color-black: #101828;
 
-  --color-brand-25: #f2f7ff;
-  --color-brand-50: #ecf3ff;
-  --color-brand-100: #dde9ff;
-  --color-brand-200: #c2d6ff;
-  --color-brand-300: #9cb9ff;
-  --color-brand-400: #7592ff;
-  --color-brand-500: #465fff;
-  --color-brand-600: #3641f5;
-  --color-brand-700: #2a31d8;
-  --color-brand-800: #252dae;
-  --color-brand-900: #262e89;
-  --color-brand-950: #161950;
+  /* Updated Brand Colors */
+  --color-brand-25: #e6f7f8;  /* Lightest */
+  --color-brand-50: #d9f2f3;
+  --color-brand-100: #b3e5e6;
+  --color-brand-200: #80d1d3;
+  --color-brand-300: #4daead;
+  --color-brand-400: #1a8a8c;
+  --color-brand-500: #006769;  /* Primary */
+  --color-brand-600: #006062;
+  --color-brand-700: #005658;
+  --color-brand-800: #004244;
+  --color-brand-900: #002e2f;
+  --color-brand-950: #001a1a;  /* Darkest */
 
   --color-blue-light-25: #f5fbff;
   --color-blue-light-50: #f0f9ff;
@@ -176,6 +177,9 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
+  ::-webkit-backdrop {
+    border-color: var(--color-gray-200, currentColor);
+  }
   *,
   ::after,
   ::before,
@@ -378,7 +382,9 @@
 }
 .flatpickr-month .flatpickr-current-month .flatpickr-monthDropdown-months {
   background: none !important;
-  appearance: none;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
   background-image: none !important;
   font-weight: 500;
 }
@@ -736,5 +742,6 @@ span.flatpickr-weekday,
   box-shadow: 0 1px 3px 0 rgba(16, 24, 40, 0.1),
     0 1px 2px 0 rgba(16, 24, 40, 0.06);
   opacity: 0.8;
+  cursor: -webkit-grabbing;
   cursor: grabbing; /* Changes the cursor to indicate dragging */
 }

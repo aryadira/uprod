@@ -24,6 +24,18 @@ class MajorController extends Controller
         ]);
     }
 
+    public function getBySlug($slug)
+    {
+        $major = $this->majorService->getBySlug($slug);
+
+        return response()->json([
+            'status' => 'success',
+            'statusCode' => 200,
+            'message' => 'Get single major!',
+            'major' => $major
+        ]);
+    }
+
     public function createMajor(Request $request)
     {
         $validated = $request->validate([
@@ -54,22 +66,6 @@ class MajorController extends Controller
             'message' => 'Major created successfully!',
             'data' => $newMajor
         ]);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
     }
 
     /**

@@ -9,6 +9,31 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
+    public function getAll()
+    {
+        $admins = User::query()->where('user_role_id', 2)
+            ->select('id', 'name', 'email')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Get all admin!',
+            'admins' => $admins
+        ]);
+    }
+
+    public function getById($id) {
+        $admin = User::query()->where('user_role_id', 2)
+            ->where('id', $id)
+            ->first();
+            
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Get single admin!',
+            'admin' => $admin
+        ]);
+    }
+
     public function searchAdminByEmail(Request $request)
     {
         $email = $request->query('email');

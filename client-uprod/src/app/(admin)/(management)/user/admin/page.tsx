@@ -2,10 +2,10 @@ import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { Metadata } from "next";
 import React from "react";
-import TableMajor from "./(table)/TableMajor";
+import TableAdmin from "./(table)/TableAdmin";
 
 export const metadata: Metadata = {
-  title: "Major list | Uprod",
+  title: "Admin list | Uprod",
   description:
     "This is Next.js Basic Table  page for TailAdmin  Tailwind CSS Admin Dashboard Template",
 };
@@ -15,8 +15,8 @@ export default function Major() {
     <div>
       <PageBreadcrumb />
       <div className="space-y-6">
-        <ComponentCard title="Major List" buttonText="Add major" buttonHref="/major/create">
-          <TableMajor />
+        <ComponentCard title="Admin List" buttonText="Add admin" buttonHref="/admin/create">
+          <TableAdmin />
         </ComponentCard>
       </div>
     </div>

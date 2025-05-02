@@ -99,7 +99,7 @@ export default function CreateMajor() {
     setAbortController(controller);
 
     try {
-      const res = await useAxios.get(`/user/admin/search?email=${email}`, {
+      const res = await useAxios.get(`/user/admin?email=${email}`, {
         headers: { Authorization: `Bearer ${authToken}` },
         signal: controller.signal,
       });

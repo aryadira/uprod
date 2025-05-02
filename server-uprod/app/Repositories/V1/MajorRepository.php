@@ -15,6 +15,15 @@ class MajorRepository
         return $this->major->all();
     }
 
+    public function findById($slug)
+    {
+        return $this->major
+            ->where('slug', $slug)->with(['user:id,name,email']) // hanya ambil id dan name dari tabel users
+            ->whereRelation('user', 'user_role_id', 2)
+            ->get();
+        ;
+    }
+
     public function getMajorAdmin()
     {
         return $this->major
@@ -27,7 +36,7 @@ class MajorRepository
     {
         return $this->major
             ->query()
-            ->with(['user:id,name']) // hanya ambil id dan name dari tabel users
+            ->with(['user:id,name,email']) // hanya ambil id dan name dari tabel users
             ->whereRelation('user', 'user_role_id', 2)
             ->limit($limit)
             ->get();

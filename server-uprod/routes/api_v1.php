@@ -17,12 +17,17 @@ Route::prefix('v1')->name('v1.')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('user')->name('user.')->group(function () {
             Route::get('/current', [UserController::class, 'getCurrentUser'])->name('current');
-            Route::get('/admin', [AdminController::class, 'searchAdminByEmail'])->name('admin');
+            
+            // ADMIN
+            Route::get('/admin', [AdminController::class, 'getAll'])->name('admin');
+            Route::get('/admin/{id}', [AdminController::class, 'getById'])->name('admin.show');
+            Route::get('/admin/search', [AdminController::class, 'searchAdminByEmail'])->name('admin.search');
         });
 
         Route::middleware('role:superadmin,admin')->group(function () {
             Route::prefix('major')->name('major.')->group(function () {
                 Route::get('/', [MajorController::class, 'getAll'])->name('all');
+                Route::get('/{slug}', [MajorController::class, 'getBySlug'])->name('show');
                 Route::post('/create', [MajorController::class, 'createMajor'])->name('create');
             });
         });
