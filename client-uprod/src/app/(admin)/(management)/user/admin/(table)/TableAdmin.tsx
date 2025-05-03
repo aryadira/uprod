@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Admin } from "../type";
+import { Admin } from "@/types";
 import Badge from "@/components/ui/badge/Badge";
 
 const HEADER_CELLS = [

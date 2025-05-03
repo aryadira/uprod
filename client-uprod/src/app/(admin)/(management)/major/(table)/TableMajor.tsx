@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import Loader from "@/components/common/Loader";
 // import RefreshButton from "@/components/common/RefreshButton";
 import Button from "@/components/ui/button/Button";
-import { Major } from "../type";
+import { Major } from "@/types";
 
 import {
   Table,

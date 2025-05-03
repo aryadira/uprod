@@ -4,11 +4,11 @@ import { useAuth } from '@/context/AuthContext';
 import useAxios from '@/hooks/useAxios';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-import { Major } from '../type';
 import Image from 'next/image';
 import toast from "react-hot-toast";
 import Loader from '@/components/common/Loader';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import { Major } from '@/types';
 
 export default function MajorProfile() {
   const { majorSlug } = useParams();

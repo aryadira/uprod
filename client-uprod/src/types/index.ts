@@ -13,4 +13,11 @@ export interface Major {
     name: string;
     email: string;
   };
+}
+
+export interface Admin {
+  id: number;
+  name: string;
+  email: string;
+  is_assigned: "assigned" | "unassigned";
 } 

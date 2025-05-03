@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import useAxios from '@/hooks/useAxios';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-import { Admin } from '../type';
+import { Admin } from '@/types';
 // import Image from 'next/image';
 import toast from "react-hot-toast";
 import Loader from '@/components/common/Loader';
