@@ -15,7 +15,7 @@ export default function Major() {
     <div>
       <PageBreadcrumb />
       <div className="space-y-6">
-        <ComponentCard title="Admin List" buttonText="Add admin" buttonHref="/admin/create">
+        <ComponentCard title="Admin List" buttonText="Add admin" buttonHref="/user/admin/create">
           <TableAdmin />
         </ComponentCard>
       </div>

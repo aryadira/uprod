@@ -17,11 +17,14 @@ Route::prefix('v1')->name('v1.')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('user')->name('user.')->group(function () {
             Route::get('/current', [UserController::class, 'getCurrentUser'])->name('current');
-            
+
             // ADMIN
             Route::get('/admin', [AdminController::class, 'getAll'])->name('admin');
             Route::get('/admin/search', [AdminController::class, 'searchAdminByEmail'])->name('admin.search');
+            Route::post('/admin/create', [AdminController::class, 'createAdmin'])->name('admin.create');
             Route::get('/admin/{id}', [AdminController::class, 'getById'])->name('admin.show');
+            Route::put('/admin/{id}', [AdminController::class, 'updateAdmin'])->name('admin.update');
+            Route::delete('/admin/{id}', [AdminController::class, 'deleteAdmin'])->name('admin.delete');
         });
 
         Route::middleware('role:superadmin,admin')->group(function () {

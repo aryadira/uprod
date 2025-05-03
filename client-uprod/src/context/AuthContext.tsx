@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import useAxios from "@/hooks/useAxios";
 import toast from "react-hot-toast";
@@ -52,7 +52,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
   if (typeof window !== 'undefined') {
-      const storedToken = Cookies.get("authToken");
+      // const storedToken = Cookies.get("authToken");
+      const storedToken = localStorage.getItem('authToken');
       if (storedToken) {
         setAuthToken(storedToken);
       } else {
@@ -97,7 +98,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { message, token, status } = res.data;
 
       if (status === "success") {
-        Cookies.set("authToken", token, { expires: 7 });
+        localStorage.setItem('authToken', token);
+        // Cookies.set("authToken", token, { expires: 7 });
         setAuthToken(token);
 
         const userRes = await useAxios.get("/user/current", {
@@ -190,7 +192,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (err: any) {
       setErrorMessages(err.response.data.message);
     } finally {
-      Cookies.remove('authToken');
+      localStorage.removeItem('authToken')
       setAuthToken(null);
       setCurrentUser(null);
     }

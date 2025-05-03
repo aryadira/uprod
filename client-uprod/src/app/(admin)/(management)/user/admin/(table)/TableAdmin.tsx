@@ -88,7 +88,7 @@ const TableAdmin = () => {
           Please create the first admin below!
         </p>
       </div>
-      <Button type="link" href="/admin/create">
+      <Button type="link" href="/user/admin/create">
         Go to create
       </Button>
     </div>
