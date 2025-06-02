@@ -19,13 +19,17 @@ return new class extends Migration
             $table->string('nik')->unique()->nullable(); // Pastikan NIK unik
             $table->string('no_ktp')->unique()->nullable(); // Pastikan nomor KTP unik
             $table->string('email')->unique()->nullable(); // Menambahkan email
-            $table->string('phone')->nullable(); // Menambahkan nomor telepon
-            $table->enum('gender', ['m', 'f'])->default(null)->nullable();
+            $table->string('mobile_number')->nullable(); // Menambahkan nomor telepon
+            $table->enum('gender', ['male', 'female'])->nullable();
             $table->date('date_of_birth')->nullable();
             $table->text('address')->nullable(); // Menambahkan alamat
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
+            $table->index('nik');
+            $table->index('no_ktp');
+            $table->index('email');
         });
 
     }

@@ -19,12 +19,14 @@ Route::prefix('v1')->name('v1.')->group(function () {
             Route::get('/current', [UserController::class, 'getCurrentUser'])->name('current');
 
             // ADMIN
-            Route::get('/admin', [AdminController::class, 'getAll'])->name('admin');
-            Route::get('/admin/search', [AdminController::class, 'searchAdminByEmail'])->name('admin.search');
-            Route::post('/admin/create', [AdminController::class, 'createAdmin'])->name('admin.create');
-            Route::get('/admin/{id}', [AdminController::class, 'getById'])->name('admin.show');
-            Route::put('/admin/{id}', [AdminController::class, 'updateAdmin'])->name('admin.update');
-            Route::delete('/admin/{id}', [AdminController::class, 'deleteAdmin'])->name('admin.delete');
+            Route::prefix('admin')->name('admin.')->group(function () {
+                Route::get('/', [AdminController::class, 'getAll'])->name('admin');
+                Route::get('/search', [AdminController::class, 'searchAdminByEmail'])->name('search');
+                Route::post('/create', [AdminController::class, 'createAdmin'])->name('create');
+                Route::get('/{id}', [AdminController::class, 'getById'])->name('show');
+                Route::put('/{id}', [AdminController::class, 'updateAdmin'])->name('update');
+                Route::delete('/{id}', [AdminController::class, 'deleteAdmin'])->name('delete');
+            });
         });
 
         Route::middleware('role:superadmin,admin')->group(function () {
