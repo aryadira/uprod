@@ -37,7 +37,7 @@ class ProductRepository
 
     public function updateProduct(string $id, array $data): Product
     {
-        $product = $this->product->findOrFail($id);
+        $product = $this->product->find($id);
 
         $product->update($data);
 
@@ -46,9 +46,9 @@ class ProductRepository
 
     public function deleteProduct(string $id): bool|null
     {
-        $product = $this->product->findOrFail($id);
+        $product = $this->product->find($id);
 
-        return (bool) $product->delete();
+        return (bool) $product?->delete();
     }
 
     public function getProductImage(string $productId){
@@ -57,7 +57,7 @@ class ProductRepository
 
     public function uploadProductImage(string $image, string $id)
     {
-        $product = $this->product->findOrFail($id);
+        $product = $this->product->find($id);
 
         $productImage = $this->productImage->create([
             'product_id' => $product->id,
@@ -71,6 +71,6 @@ class ProductRepository
     {
         $productImage = $this->getProductImage($id);
 
-        return (bool) $productImage->delete();
+        return (bool) $productImage?->delete();
     }
 }
