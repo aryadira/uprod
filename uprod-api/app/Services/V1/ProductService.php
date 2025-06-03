@@ -31,6 +31,7 @@ class ProductService
         $data['major_id'] = $currentMajor->id;
         $data['code'] = 'PRD.' . Carbon::now()->format('Ym') . rand(100000, 999999);
         $data['slug'] = Str::slug($data['name']);
+        $data['availability'] = ($data['stock'] == 0) ? 'out_of_stock' : (($data['stock'] >= 10) ? 'available' : 'low_stock');
 
         $product = $this->productRepository->createProduct($data);
 
