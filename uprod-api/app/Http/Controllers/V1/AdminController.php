@@ -14,7 +14,6 @@ use Illuminate\Validation\ValidationException; // Import ValidationException
 // use App\Http\Requests\V1\StoreAdminRequest;
 // use App\Http\Requests\V1\UpdateAdminRequest;
 
-
 class AdminController extends Controller
 {
     public function getAll()
@@ -112,7 +111,7 @@ class AdminController extends Controller
      */
     public function createAdmin(Request $request) // Ganti Request -> StoreAdminRequest
     {
-        $validatedData = $request->validate([
+        $data = $request->validate([
             'nik' => 'required|string|size:16|unique:admins,nik',
             'id_card_number' => 'nullable|string|size:16|unique:admins,id_card_number',
             'full_name' => 'required|string|max:255',
@@ -124,7 +123,7 @@ class AdminController extends Controller
         ]);
 
         // Pastikan user_id yang diberikan memiliki role admin (user_role_id = 2)
-        $user = User::find($validatedData['user_id']);
+        $user = User::find($data['user_id']);
         if (!$user || $user->user_role_id !== 2) {
             return response()->json([
                 'status' => 'error',
@@ -133,7 +132,7 @@ class AdminController extends Controller
         }
 
         // Pastikan belum ada admin profile untuk user_id ini
-        if (Admin::where('user_id', $validatedData['user_id'])->exists()) {
+        if (Admin::where('user_id', $data['user_id'])->exists()) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'User ini sudah memiliki profil admin.',
@@ -142,7 +141,7 @@ class AdminController extends Controller
 
         DB::beginTransaction();
         try {
-            $admin = Admin::create($validatedData);
+            $admin = Admin::create($data);
 
             DB::commit();
 
@@ -207,7 +206,7 @@ class AdminController extends Controller
 
         // --- Validasi Awal (Contoh, pindahkan ke UpdateAdminRequest) ---
         try {
-            $validatedData = $request->validate([
+            $data = $request->validate([
                 // user_id tidak boleh diubah di update
                 'nik' => 'required|string|size:16|unique:admins,nik,' . $admin->id, // Abaikan unique check untuk record ini sendiri
                 'id_card_number' => 'nullable|string|size:16|unique:admins,id_card_number,' . $admin->id,
@@ -230,7 +229,7 @@ class AdminController extends Controller
 
         DB::beginTransaction();
         try {
-            $admin->update($validatedData);
+            $admin->update($data);
             DB::commit();
 
             return response()->json([

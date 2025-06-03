@@ -15,11 +15,18 @@ class Product extends Model
         'code',
         'price',
         'stock',
-        'description'
+        'description',
+        'availability',
+        'is_active'
     ];
 
     public function major()
     {
         return $this->belongsTo(Major::class, 'major_id', 'id');
+    }
+
+    public function productImages()
+    {
+        return $this->hasMany(ProductImage::class, 'product_id', 'id');
     }
 }

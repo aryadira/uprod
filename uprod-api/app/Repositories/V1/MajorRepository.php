@@ -3,6 +3,7 @@
 namespace App\Repositories\V1;
 
 use App\Models\V1\Major;
+use Illuminate\Support\Collection;
 
 class MajorRepository
 {
@@ -10,12 +11,12 @@ class MajorRepository
     {
     }
 
-    public function getAll()
+    public function getAll(): Collection
     {
-        return $this->major->all();
+        return collect($this->major->all());
     }
 
-    public function findById($slug)
+    public function getById(string $slug)
     {
         return $this->major
             ->where('slug', $slug)->with(['user:id,name,email']) // hanya ambil id dan name dari tabel users

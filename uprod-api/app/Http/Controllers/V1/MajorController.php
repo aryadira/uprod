@@ -4,36 +4,29 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\V1\MajorService;
+use App\Services\V1\API\APIService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MajorController extends Controller
 {
-    public function __construct(protected MajorService $majorService)
-    {
+    public function __construct(
+        protected MajorService $majorService,
+        protected APIService $apiService,
+    ) {
     }
-
-    public function getAll()
+    public function getAll(): JsonResponse
     {
-        $majors = $this->majorService->getByLimit(10);
+        $majors = $this->majorService->getAll();
 
-        return response()->json([
-            'status' => 'success',
-            'statusCode' => 200,
-            'message' => 'Get all major data',
-            'major' => $majors
-        ]);
+        return $this->apiService->sendSuccess('Get major data', compact('majors'));
     }
 
     public function getBySlug($slug)
     {
         $major = $this->majorService->getBySlug($slug);
 
-        return response()->json([
-            'status' => 'success',
-            'statusCode' => 200,
-            'message' => 'Get single major!',
-            'major' => $major
-        ]);
+        return $this->apiService->sendSuccess('Get single major', compact('major'));
     }
 
     public function createMajor(Request $request)
@@ -60,12 +53,7 @@ class MajorController extends Controller
 
         $newMajor = $this->majorService->createMajor($validated);
 
-        return response()->json([
-            'status' => 'success',
-            'statusCode' => 200,
-            'message' => 'Major created successfully!',
-            'data' => $newMajor
-        ]);
+        return $this->apiService->sendSuccess('Major created successfully!', compact('newMajor'));
     }
 
     /**

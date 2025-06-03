@@ -5,13 +5,13 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\V1\Major;
 use App\Models\V1\User;
-use App\Services\V1\API\APIResponseService;
+use App\Services\V1\API\APIService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    public function __construct(protected APIResponseService $apiResponseService)
+    public function __construct(protected APIService $APIService)
     {
     }
 

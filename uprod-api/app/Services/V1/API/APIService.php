@@ -4,7 +4,7 @@ namespace App\Services\V1\API;
 
 use Illuminate\Http\JsonResponse;
 
-class APIResponseService
+class APIService
 {
     public function sendResponse(int $statusCode, string $message, $data = null): JsonResponse
     {

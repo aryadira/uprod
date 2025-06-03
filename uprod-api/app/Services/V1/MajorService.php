@@ -4,25 +4,22 @@ namespace App\Services\V1;
 
 use App\Models\V1\Major;
 use App\Repositories\V1\MajorRepository;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-
-use function App\Helpers\generateCode;
-use function App\Helpers\generateAcronim;
 
 class MajorService
 {
-    public function __construct(protected MajorRepository $majorRepository)
+    public function __construct(
+        protected MajorRepository $majorRepository)
     {
     }
 
-    public function getAll()
+    public function getAll() 
     {
         return $this->majorRepository->getAll();
     }
 
     public function getBySlug($slug) {
-        return $this->majorRepository->findById($slug);
+        return $this->majorRepository->getById($slug);
     }
 
     public function getByLimit(int $limit = 10)
