@@ -39,8 +39,10 @@ Route::prefix('v1')->name('v1.')->group(function () {
 
             Route::prefix('product')->name('product.')->group(function () {
                 Route::get('/', [ProductController::class, 'getAll'])->name('all');
-                Route::get('/{id}', [ProductController::class, 'getById'])->name('details');
-                Route::post('/create', [ProductController::class, 'createProduct'])->name(name: 'create');
+                Route::get('/{id}', [ProductController::class, 'productDetails'])->name('details');
+                Route::post('/create', [ProductController::class, 'createProduct'])->name('create');
+                Route::put('/update/{id}', [ProductController::class, 'updateProduct'])->name('update');
+                Route::delete('/delete/{id}', [ProductController::class, 'deleteProduct'])->name('delete');
             });
         });
 

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Services\V1\API\APIService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -25,7 +26,7 @@ class ProductController extends Controller
     }
 
     public function createProduct(Request $request)
-    {        
+    {
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|integer',
@@ -48,47 +49,57 @@ class ProductController extends Controller
         } catch (\Exception $error) {
             DB::rollBack();
 
-            return $this->apiService->sendError("Gagal menambahkan produk" . $error->getMessage());
+            Log::alert($error->getMessage());
+
+            return $this->apiService->sendError("Gagal menambahkan produk");
+        }
+    }
+    public function productDetails(string $id): JsonResponse
+    {
+        $product = $this->productService->getById($id);
+
+        if (!$product) {
+            return $this->apiService->sendNotFound("Produk tidak ditemukan");
+        }
+
+        return $this->apiService->sendSuccess('Get ' . $product->name, compact('product'));
+    }
+
+    public function updateProduct(Request $request, string $id)
+    {
+        $data = $request->validate([
+            'name' => 'string|max:255',
+            'price' => 'integer',
+            'stock' => 'nullable|integer',
+            'description' => 'nullable|string|max:255',
+            'images' => 'array|max:5',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $product = $this->productService->updateProduct($id, $data);
+
+            DB::commit();
+
+            return $this->apiService->sendSuccess('Produk berhasil diubah', compact('product'));
+        } catch (\Exception $error) {
+            DB::rollBack();
+
+            Log::alert($error->getMessage());
+
+            return $this->apiService->sendError("Gagal mengubah produk");
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    public function deleteProduct(string $id)
+    {   
+        $deletedProduct =  $this->productService->deleteProduct($id);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        if (!$deletedProduct) {
+            return $this->apiService->sendNotFound("Produk tidak ditemukan");
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return $this->apiService->sendSuccess('Produk berhasil dihapus');
     }
 }
