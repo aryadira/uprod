@@ -39,21 +39,24 @@ class MajorController extends Controller
             'description' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        if ($request->hasFile('logo_path') && $request->file('logo_path')->isValid()) {
-            $logoName = time() . '_logo_' . $request->file('logo_path')->getClientOriginalName();
-            $request->file('logo_path')->move(public_path('uploads/major/logo'), $logoName);
-            $validated['logo_path'] = 'uploads/major/logo/' . $logoName;
-        }
-
-        if ($request->hasFile('banner_path') && $request->file('banner_path')->isValid()) {
-            $bannerName = time() . '_banner_' . $request->file('banner_path')->getClientOriginalName();
-            $request->file('banner_path')->move(public_path('uploads/major/banner'), $bannerName);
-            $validated['banner_path'] = 'uploads/major/banner/' . $bannerName;
-        }
+        $validated['logo_path'] = $this->uploadImage($request, 'logo_path', 'major/logo');
+        $validated['banner_path'] = $this->uploadImage($request, 'banner_path', 'major/banner');
 
         $newMajor = $this->majorService->createMajor($validated);
 
         return $this->apiService->sendSuccess('Major created successfully!', compact('newMajor'));
+    }
+
+    private function uploadImage(Request $request, string $field, string $destinationPath)
+    {
+        if ($request->hasFile($field) && $request->file($field)->isValid()) {
+            $file = $request->file($field);
+            $name = time() . '_' . $field . '_' . $file->getClientOriginalName();
+            $file->move(public_path('/uploads/' . $destinationPath), $name);
+            return $destinationPath . '/' . $name;
+        }
+
+        return null;
     }
 
     /**

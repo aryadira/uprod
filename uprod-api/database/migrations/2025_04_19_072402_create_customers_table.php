@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,12 +12,11 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->nullable(false);
-
+            $table->unsignedBigInteger('user_id');
             $table->string('fullname');
             $table->string('nik')->unique()->nullable(); // Pastikan NIK unik
             $table->string('no_ktp')->unique()->nullable(); // Pastikan nomor KTP unik
-            $table->string('email')->unique()->nullable(); // Menambahkan email
+            $table->string('contact_email')->unique()->nullable(); // Menambahkan email
             $table->string('mobile_number')->nullable(); // Menambahkan nomor telepon
             $table->enum('gender', ['male', 'female'])->nullable();
             $table->date('date_of_birth')->nullable();
@@ -29,7 +27,7 @@ return new class extends Migration
 
             $table->index('nik');
             $table->index('no_ktp');
-            $table->index('email');
+            $table->index('contact_email');
         });
 
     }

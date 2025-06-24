@@ -10,24 +10,19 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('admins', function (Blueprint $table) {
+        Schema::create('technicians', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->unique();
-            $table->string('nik', 16)->unique()->nullable();
-            $table->string('no_ktp', 16)->unique()->nullable();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('major_id')->nullable();
             $table->string('fullname');
-            $table->string('contact_email');
-            $table->string('place_of_birth')->nullable();
-            $table->date('date_of_birth')->nullable();
+            $table->string('contact_email')->unique()->nullable();
+            $table->string('major_name_string')->nullable();
             $table->enum('gender', ['male', 'female'])->nullable();
-            $table->text('address')->nullable();
-            $table->string('mobile_number', 15)->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('major_id')->references('id')->on('majors');
 
-            $table->index('nik');
-            $table->index('no_ktp');
             $table->index('contact_email');
         });
     }
@@ -37,6 +32,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('admins');
+        Schema::dropIfExists('technicians');
     }
 };

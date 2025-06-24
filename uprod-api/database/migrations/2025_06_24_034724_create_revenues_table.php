@@ -10,16 +10,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('services', function (Blueprint $table) {
+        Schema::create('revenues', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('major_id');
-            $table->string('service_name');
-            $table->string('slug');
-            $table->string('code')->unique();
-            $table->decimal('price', 10, 2);
-            $table->text('description')->default('Tidak ada deskripsi.');
-            $table->enum('availability', ['open', 'closed'])->default('open');
-            $table->boolean('is_active')->default(false);
+            $table->decimal('amount', 15, 2);
             $table->timestamps();
 
             $table->foreign('major_id')->references('id')->on('majors')->onDelete('cascade');
@@ -31,6 +25,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('services');
+        Schema::dropIfExists('revenues');
     }
 };
