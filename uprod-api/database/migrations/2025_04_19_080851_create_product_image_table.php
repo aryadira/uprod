@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('product_id')->nullable();
             $table->string('image_path', 150)->nullable()->default('product-image-default.png');
+            $table->integer('image_order')->default(1)->index();
             $table->timestamps();
 
             $table->foreign('product_id')->references('id')->on(table: 'products')->onDelete('cascade');

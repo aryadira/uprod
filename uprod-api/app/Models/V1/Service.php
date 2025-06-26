@@ -3,30 +3,30 @@
 namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Product extends Model
+class Service extends Model
 {
-    protected $table = 'products';
+    protected $table = 'services';
 
     protected $fillable = [
         'major_id',
-        'product_code',
-        'product_name',
+        'service_code',
+        'service_name',
         'slug',
         'price',
-        'stock',
         'description',
         'availability',
         'is_active'
     ];
 
-    public function major()
+    public function major(): BelongsTo
     {
         return $this->belongsTo(Major::class, 'major_id', 'id');
     }
 
-    public function productImages()
+    public function serviceImage()
     {
-        return $this->hasMany(ProductImage::class, 'product_id', 'id');
+        return $this->hasMany(ServiceImage::class, 'service_id', 'id');
     }
 }

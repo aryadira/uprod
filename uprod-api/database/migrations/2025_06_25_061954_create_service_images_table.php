@@ -11,14 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_image', function (Blueprint $table) {
+        Schema::create('service_images', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('service_id')->nullable();
-            $table->string('image_path', 150)->default('service-image-default.png');
-            $table->integer('image_order')->default(1)->index();
             $table->timestamps();
-
-            $table->foreign('service_id')->references('id')->on(table: 'services')->onDelete('cascade');
         });
     }
 

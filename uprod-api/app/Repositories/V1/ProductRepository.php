@@ -17,10 +17,12 @@ class ProductRepository
 
     public function getAll(): Collection
     {
-        $columns = ['id', 'name', 'code', 'price', 'availability', 'is_active', 'created_at'];
-        $relations = ['productImages:id,product_id,image_path'];
+        $columns = ['id', 'product_code', 'product_name', 'price', 'availability', 'is_active', 'created_at'];
+        $relations = ['productImages:id,product_id,image_path,image_order'];
 
-        $products = $this->product->select($columns)->with($relations)->get();
+        $products = $this->product
+            ->select($columns)
+            ->with($relations)->get();
 
         return collect($products);
     }
@@ -51,17 +53,19 @@ class ProductRepository
         return (bool) $product?->delete();
     }
 
-    public function getProductImage(string $productId){
+    public function getProductImage(string $productId)
+    {
         return $this->productImage->where('product_id', $productId)->get();
     }
 
-    public function uploadProductImage(string $image, string $id)
+    public function uploadProductImage(string $productId, array $image)
     {
-        $product = $this->product->find($id);
+        $product = $this->product->find($productId);
 
         $productImage = $this->productImage->create([
             'product_id' => $product->id,
-            'image_path' => $image
+            'image_path' => $image['image_path'],
+            'image_order' => $image['image_order']
         ]);
 
         return $productImage;

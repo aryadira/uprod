@@ -13,7 +13,7 @@ class MajorService
     {
     }
 
-    public function getAll() 
+    public function getAll()
     {
         return $this->majorRepository->getAll();
     }
@@ -31,7 +31,7 @@ class MajorService
     {
         $data['slug'] = Str::slug($data['name'], '_'); // => "information_systems"
 
-        $data['acronim'] = collect(explode(' ', $data['name']))
+        $data['major_acronim'] = collect(explode(' ', $data['name']))
             ->filter(fn($word) => ctype_upper($word[0]))
             ->map(fn($word) => strtoupper(substr($word, 0, 1)))
             ->join('');

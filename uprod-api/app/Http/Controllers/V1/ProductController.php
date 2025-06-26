@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\V1\ProductService;
 use Illuminate\Http\Request;
 use App\Services\V1\API\APIService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -28,7 +29,7 @@ class ProductController extends Controller
     public function createProduct(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
+            'product_name' => 'required|string|max:255',
             'price' => 'required|integer',
             'stock' => 'nullable|integer',
             'description' => 'nullable|string|max:255',
@@ -36,11 +37,13 @@ class ProductController extends Controller
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        if (isset($data['images']) && count($data['images']) > 5) {
+            return $this->apiService->sendError("Gambar tidak boleh lebih dari 5.");
+        }
+
         DB::beginTransaction();
         try {
-            if ($request->hasFile('images')) {
-                $product = $this->productService->createProduct($data);
-            }
+            $product = $this->productService->createProduct($data);
 
             DB::commit();
 
@@ -93,8 +96,8 @@ class ProductController extends Controller
     }
 
     public function deleteProduct(string $id)
-    {   
-        $deletedProduct =  $this->productService->deleteProduct($id);
+    {
+        $deletedProduct = $this->productService->deleteProduct($id);
 
         if (!$deletedProduct) {
             return $this->apiService->sendNotFound("Produk tidak ditemukan");

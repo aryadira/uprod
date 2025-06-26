@@ -4,7 +4,6 @@ namespace App\Services\V1;
 
 use App\Repositories\V1\ProductRepository;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use App\Models\V1\Major;
 use App\Models\V1\Product;
 use Illuminate\Support\Carbon;
@@ -39,60 +38,64 @@ class ProductService
     {
         $currentUser = Auth::user();
         $currentMajor = Major::where('admin_id', $currentUser->id)->first();
-
         $data['major_id'] = $currentMajor->id;
-        $data['code'] = 'PRD.' . Carbon::now()->format('Ym') . rand(100000, 999999);
-        $data['slug'] = Str::slug($data['name']);
-        $data['availability'] = ($data['stock'] == 0) ? 'out_of_stock' : (($data['stock'] >= 10) ? 'available' : 'low_stock');
+        $data['product_code'] = 'PRD.' . Carbon::now()->format('Ym') . '.' . random_int(100000, 999999);
+        $data['slug'] = Str::slug($data['product_name']);
+        $data['availability'] = $this->availabilityClassification($data['stock']);
 
         $product = $this->productRepository->createProduct($data);
 
         $uploadedImages = [];
-
-        foreach ($data['images'] as $image) {
-            $imageName = Carbon::now()->format('Ymd') . Str::random(10) . $image->getClientOriginalName();
-            $image->move(public_path('uploads/products'), $imageName);
-            $storedImage = $this->productRepository->uploadProductImage($imageName, $product->id);
-            $uploadedImages[] = $storedImage;
+        foreach ($data['images'] ?? [] as $idx => $image) {
+            $filename = Carbon::now()->format('Ymd') . Str::random(10) . $image->getClientOriginalName();
+            $image->move(public_path('uploads/products'), $filename);
+            $imageData = [
+                'image_path' => $filename,
+                'image_order' => $idx + 1,
+            ];
+            $uploadedImages[] = $this->productRepository->uploadProductImage($product->id, $imageData);
         }
-
         $data['images'] = $uploadedImages;
-
         return $data;
     }
 
-    public function uploadProductImage($image, $productId)
+    private function availabilityClassification($stock)
     {
-        $productImage = $this->productRepository->uploadProductImage($image, $productId);
-
-        return $productImage;
+        return $stock == 0 ? 'out_of_stock' : ($stock > 10 ? "available" : "low_stock");
     }
 
-    public function updateProduct(string $id, array $data): Product|null {
+    public function uploadProductImage($productId, $image)
+    {
+        return $this->productRepository->uploadProductImage($productId, $image);
+    }
+
+    public function updateProduct(string $id, array $data): Product|null
+    {
         $updatedProduct = $this->productRepository->updateProduct($id, $data);
 
-        $uploadedImages = $data['images'] ?? []; 
+        $uploadedImages = $data['images'] ?? [];
 
-        if($uploadedImages){
-            foreach($uploadedImages as $image){
+        if ($uploadedImages) {
+            foreach ($uploadedImages as $image) {
                 $imageName = Carbon::now()->format('Ymd') . Str::random(10) . $image->getClientOriginalName();
                 $image->move(public_path('uploads/products'), $imageName);
 
-                $this->productRepository->uploadProductImage($imageName, $id);
+                $this->productRepository->uploadProductImage($id, $image);
             }
         }
-        
-        if(!$updatedProduct){
+
+        if (!$updatedProduct) {
             return null;
         }
 
         return $updatedProduct;
     }
 
-    public function deleteProduct(string $id): bool|null{
+    public function deleteProduct(string $id): bool|null
+    {
         $deletedProduct = $this->productRepository->deleteProduct($id);
 
-        if(!$deletedProduct){
+        if (!$deletedProduct) {
             return null;
         }
 

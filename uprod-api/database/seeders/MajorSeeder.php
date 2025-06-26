@@ -19,8 +19,8 @@ class MajorSeeder extends Seeder
                 'slug' => Str::slug('Information Technology'),
                 'logo_path' => 'images/majors/it-logo.png',
                 'banner_path' => 'images/majors/it-banner.jpg',
-                'name' => 'Information Technology',
-                'acronim' => 'IT',
+                'major_name' => 'Information Technology',
+                'major_acronim' => 'IT',
                 'description' => 'The IT major focuses on the study of computing technologies and information systems.',
             ],
             [
@@ -28,8 +28,8 @@ class MajorSeeder extends Seeder
                 'slug' => Str::slug('Business Administration'),
                 'logo_path' => 'images/majors/business-logo.png',
                 'banner_path' => 'images/majors/business-banner.jpg',
-                'name' => 'Business Administration',
-                'acronim' => 'BA',
+                'major_name' => 'Business Administration',
+                'major_acronim' => 'BA',
                 'description' => 'Business Administration major teaches principles of business, management, and operations.',
             ],
             [
@@ -37,8 +37,8 @@ class MajorSeeder extends Seeder
                 'slug' => Str::slug('Mechanical Engineering'),
                 'logo_path' => 'images/majors/mech-logo.png',
                 'banner_path' => 'images/majors/mech-banner.jpg',
-                'name' => 'Mechanical Engineering',
-                'acronim' => 'ME',
+                'major_name' => 'Mechanical Engineering',
+                'major_acronim' => 'ME',
                 'description' => 'Mechanical Engineering major covers mechanical systems, design, and manufacturing.',
             ]
         ];

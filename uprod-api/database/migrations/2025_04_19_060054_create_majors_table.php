@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('logo_path', 100)->nullable();
             $table->string('banner_path', 100)->nullable();
-            $table->string('name', 100);
-            $table->string('acronim', 10);
+            $table->string('major_name', 100);
+            $table->string('major_acronim', 10);
             $table->string('contact_email')->nullable();
             $table->text('description')->nullable()->default('Tidak ada deskripsi.');
             $table->timestamps();
